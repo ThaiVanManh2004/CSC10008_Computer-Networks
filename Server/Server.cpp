@@ -3,45 +3,8 @@
 //
 
 #include "pch.h"
-#include "framework.h"
-#include "afxwinappex.h"
-#include "afxdialogex.h"
 #include "Server.h"
 #include "MainFrm.h"
-
-#include "ServerDoc.h"
-#include "ServerView.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
-
-// CServerApp
-
-BEGIN_MESSAGE_MAP(CServerApp, CWinAppEx)
-	ON_COMMAND(ID_APP_ABOUT, &CServerApp::OnAppAbout)
-	// Standard file based document commands
-	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
-	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
-END_MESSAGE_MAP()
-
-
-// CServerApp construction
-
-CServerApp::CServerApp() noexcept
-{
-	m_bHiColorIcons = TRUE;
-
-
-	m_nAppLook = 0;
-	// TODO: replace application ID string below with unique ID string; recommended
-	// format for string is CompanyName.ProductName.SubProduct.VersionInformation
-	SetAppID(_T("Server.AppID.NoVersion"));
-
-	// TODO: add construction code here,
-	// Place all significant initialization in InitInstance
-}
 
 // The one and only CServerApp object
 
@@ -52,18 +15,11 @@ CServerApp theApp;
 
 BOOL CServerApp::InitInstance()
 {
-	CWinAppEx::InitInstance();
-
 	if (!AfxSocketInit())
 	{
 		AfxMessageBox(IDP_SOCKETS_INIT_FAILED);
 		return FALSE;
 	}
-
-	EnableTaskbarInteraction(FALSE);
-
-	// AfxInitRichEdit2() is required to use RichEdit control
-	// AfxInitRichEdit2();
 
 	// Standard initialization
 	// If you are not using these features and wish to reduce the size
@@ -73,111 +29,24 @@ BOOL CServerApp::InitInstance()
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
-	LoadStdProfileSettings(4);  // Load standard INI file options (including MRU)
-
-
-	InitContextMenuManager();
-
-	InitKeyboardManager();
-
-	InitTooltipManager();
-	CMFCToolTipInfo ttParams;
-	ttParams.m_bVislManagerTheme = TRUE;
-	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
-		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
-
-	// Register the application's document templates.  Document templates
-	//  serve as the connection between documents, frame windows and views
-	CSingleDocTemplate* pDocTemplate;
-	pDocTemplate = new CSingleDocTemplate(
-		IDR_MAINFRAME,
-		RUNTIME_CLASS(CServerDoc),
-		RUNTIME_CLASS(CMainFrame),       // main SDI frame window
-		RUNTIME_CLASS(CServerView));
-	if (!pDocTemplate)
+	// To create the main window, this code creates a new frame window
+	// object and then sets it as the application's main window object
+	CFrameWnd* pFrame = new CMainFrame;
+	if (!pFrame)
 		return FALSE;
-	AddDocTemplate(pDocTemplate);
-
-
-	// Parse command line for standard shell commands, DDE, file open
-	CCommandLineInfo cmdInfo;
-	ParseCommandLine(cmdInfo);
+	m_pMainWnd = pFrame;
+	// create and load the frame with its resources
+	pFrame->LoadFrame(IDR_MAINFRAME);
 
 
 
-	// Dispatch commands specified on the command line.  Will return FALSE if
-	// app was launched with /RegServer, /Register, /Unregserver or /Unregister.
-	if (!ProcessShellCommand(cmdInfo))
-		return FALSE;
+
 
 	// The one and only window has been initialized, so show and update it
-	m_pMainWnd->ShowWindow(SW_SHOWMAXIMIZED);
-	m_pMainWnd->UpdateWindow();
+	pFrame->ShowWindow(SW_SHOWMAXIMIZED);
+	pFrame->UpdateWindow();
+	//
+	m_pMainWnd->SetMenu(NULL);
+	//
 	return TRUE;
 }
-
-// CServerApp message handlers
-
-
-// CAboutDlg dialog used for App About
-
-class CAboutDlg : public CDialogEx
-{
-public:
-	CAboutDlg() noexcept;
-
-// Dialog Data
-#ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_ABOUTBOX };
-#endif
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	DECLARE_MESSAGE_MAP()
-};
-
-CAboutDlg::CAboutDlg() noexcept : CDialogEx(IDD_ABOUTBOX)
-{
-}
-
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-}
-
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-END_MESSAGE_MAP()
-
-// App command to run the dialog
-void CServerApp::OnAppAbout()
-{
-	CAboutDlg aboutDlg;
-	aboutDlg.DoModal();
-}
-
-// CServerApp customization load/save methods
-
-void CServerApp::PreLoadState()
-{
-	BOOL bNameValid;
-	CString strName;
-	bNameValid = strName.LoadString(IDS_EDIT_MENU);
-	ASSERT(bNameValid);
-	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_EDIT);
-}
-
-void CServerApp::LoadCustomState()
-{
-}
-
-void CServerApp::SaveCustomState()
-{
-}
-
-// CServerApp message handlers
-
-
-

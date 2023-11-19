@@ -184,8 +184,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Client.h" />
-    <ClInclude Include="ClientDoc.h" />
-    <ClInclude Include="ClientView.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="pch.h" />
@@ -194,8 +192,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp" />
-    <ClCompile Include="ClientDoc.cpp" />
-    <ClCompile Include="ClientView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -206,16 +202,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\Client.ico" />
-    <Image Include="res\ClientDoc.ico" />
-    <Image Include="res\Toolbar.bmp" />
-    <Image Include="res\Toolbar256.bmp" />
-    <Image Include="res\userimages.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\Client.rc2" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
