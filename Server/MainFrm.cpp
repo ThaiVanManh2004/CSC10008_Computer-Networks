@@ -29,6 +29,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 //
 void CMainFrame::OnButtonClicked() {
-
+	((CServerApp*)AfxGetApp())->m_ServerSocket.Create(1);
+	((CServerApp*)AfxGetApp())->m_ServerSocket.Listen();
 }
 //
