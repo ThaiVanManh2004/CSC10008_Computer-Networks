@@ -4,6 +4,9 @@
 #pragma once
 
 #include "resource.h"       // main symbols
+//
+#include "ClientSocket.h"
+//
 
 
 // CClientApp:
@@ -16,4 +19,7 @@ class CClientApp : public CWinAppEx
 public:
 	virtual BOOL InitInstance();
 
+//
+	CClientSocket m_ClientSocket;
+//
 };
