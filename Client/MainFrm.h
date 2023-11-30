@@ -16,7 +16,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 //
-protected:
+public:
 	CButton cButton;
 	afx_msg void OnButtonClicked();
 //

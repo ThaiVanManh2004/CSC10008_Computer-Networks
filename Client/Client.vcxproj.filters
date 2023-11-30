@@ -36,6 +36,9 @@
     <ClInclude Include="ClientSocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ReceivingSocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ClientSocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReceivingSocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

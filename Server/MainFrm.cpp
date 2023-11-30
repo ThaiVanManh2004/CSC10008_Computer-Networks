@@ -29,7 +29,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 //
 void CMainFrame::OnButtonClicked() {
-	((CServerApp*)AfxGetApp())->m_ServerSocket.Create(1);
+	((CServerApp*)AfxGetApp())->m_ServerSocket.Create();
 	((CServerApp*)AfxGetApp())->m_ServerSocket.Listen();
+	((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.Create(0, SOCK_DGRAM);
+	((CServerApp*)AfxGetApp())->m_ServerSocket.GetSockName(((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.rSocketAddress, ((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.rSocketPort);
+	((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.SetSockOpt(SO_BROADCAST, "0", 0);
+	while (((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket != INVALID_SOCKET) {
+		((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.SendTo(&(((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.rSocketPort), sizeof(UINT), 1, NULL);
+		AfxMessageBox(_T(""));
+	}
 }
 //
