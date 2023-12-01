@@ -3,7 +3,7 @@
 //
 #include "MainFrm.h"
 //
-
+#define IDC_IMAGE                 1013
 
 void CReceivingSocket::OnReceive(int nErrorCode)
 {
@@ -17,6 +17,6 @@ void CReceivingSocket::OnReceive(int nErrorCode)
 	
 	((CMainFrame*)AfxGetMainWnd())->cButton.SetWindowTextW(rSocketAddress);
 	//
-
+	
 	CSocket::OnReceive(nErrorCode);
 }

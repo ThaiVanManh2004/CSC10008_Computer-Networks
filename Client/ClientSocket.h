@@ -10,5 +10,6 @@ class CClientSocket :
 public:
     CReceivingSocket m_ReceivingSocket;
 //
+    virtual void OnReceive(int nErrorCode);
 };
 
