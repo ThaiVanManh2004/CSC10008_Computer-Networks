@@ -1,7 +1,18 @@
+﻿
 #include "pch.h"
 #include "ClientSocket.h"
 #include "Client.h"
 #define RECV_BUFFER_SIZE 4096
+#define IDC_IMAGE 1013
+#include "afxdialogex.h"
+#include <afxwin.h>
+#include <afxcmn.h>
+
+#include <Windows.h>
+#include <string>
+#include <atlimage.h>  // for CImage
+#include <gdiplus.h>
+#include "MainFrm.h"
 
 void CClientSocket::OnReceive(int nErrorCode)
 {
@@ -111,5 +122,7 @@ PreReturnCleanup: // labelled "goto" destination
 	if (bFileIsOpen)
 		destFile.Close();
 	((CClientApp*)AfxGetApp())->m_ClientSocket.Close();
+
+	//============================Load image =============================
 	CSocket::OnReceive(nErrorCode);
 }

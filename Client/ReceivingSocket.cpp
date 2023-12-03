@@ -3,7 +3,6 @@
 //
 #include "MainFrm.h"
 //
-#define IDC_IMAGE                 1013
 
 void CReceivingSocket::OnReceive(int nErrorCode)
 {

@@ -105,10 +105,6 @@ void CServerSocket::OnAccept(int nErrorCode)
         int cbBytesSent;
         BYTE* bp = (BYTE*)(&fileLength) + sizeof(fileLength) - cbLeftToSend;
         cbBytesSent = m_SendingSocket.Send(bp, cbLeftToSend);
-        int errorCode = GetLastError();
-        CString errorMessage;
-        errorMessage.Format(_T("SendTo failed with error: %d"), errorCode);
-        AfxMessageBox(errorMessage);
         // test for errors and get out if they occurred
         if (cbBytesSent == SOCKET_ERROR)
         {
