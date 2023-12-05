@@ -8,6 +8,15 @@
 
 // The one and only CClientApp object
 
+#include "afxdialogex.h"
+#include <afxwin.h>
+#include <afxcmn.h>
+
+#include <Windows.h>
+#include <string>
+#include <atlimage.h>  // for CImage
+#include <gdiplus.h>
+
 CClientApp theApp;
 
 
@@ -38,15 +47,13 @@ BOOL CClientApp::InitInstance()
 	// create and load the frame with its resources
 	pFrame->LoadFrame(IDR_MAINFRAME);
 
-
-
-
-
 	// The one and only window has been initialized, so show and update it
 	pFrame->ShowWindow(SW_SHOWMAXIMIZED);
 	pFrame->UpdateWindow();
 	//
 	m_pMainWnd->SetMenu(NULL);
+
+
 	//
 	return TRUE;
 }

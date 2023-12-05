@@ -4,7 +4,6 @@
 #include "MainFrm.h"
 //
 
-
 void CReceivingSocket::OnReceive(int nErrorCode)
 {
 	// TODO: Add your specialized code here and/or call the base class
@@ -17,6 +16,6 @@ void CReceivingSocket::OnReceive(int nErrorCode)
 	
 	((CMainFrame*)AfxGetMainWnd())->cButton.SetWindowTextW(rSocketAddress);
 	//
-
+	
 	CSocket::OnReceive(nErrorCode);
 }

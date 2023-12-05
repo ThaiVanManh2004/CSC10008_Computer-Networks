@@ -1,4 +1,4 @@
-
+﻿
 // MainFrm.h : interface of the CMainFrame class
 //
 
@@ -19,5 +19,7 @@ protected:
 public:
 	CButton cButton;
 	afx_msg void OnButtonClicked();
+	CStatic m_pictureCtrl;
+	afx_msg void OnDisplayImage();
 //
 };

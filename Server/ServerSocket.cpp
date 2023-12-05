@@ -1,18 +1,23 @@
 #include "pch.h"
 #include "ServerSocket.h"
 //
+#include "Server.h"
 #include <Windows.h>
 #include <iostream>
 #include <fstream>
 //
-
+#define SEND_BUFFER_SIZE    4096
 
 void CServerSocket::OnAccept(int nErrorCode)
 {
 	// TODO: Add your specialized code here and/or call the base class
 	//
-	m_SendingSocket.Close();
+	m_ReceivingSocket.Close();
+
+    Accept(m_SendingSocket);
 	AfxMessageBox(_T("Connected"));
+
+
     // Get the dimensions of the primary display
     DEVMODE dm = { 0 };
     dm.dmSize = sizeof(dm);
@@ -64,6 +69,120 @@ void CServerSocket::OnAccept(int nErrorCode)
     ReleaseDC(NULL, hScreen);
 
 	//
+    BOOL bRet = TRUE;
+    // used to monitor the progress of a sending operation
+    int fileLength, cbLeftToSend;
+    // pointer to buffer for sending data
+    // (memory is allocated after sending file size)
+    BYTE* sendData = NULL;
 
+    CFile sourceFile;
+    CFileException fe;
+    BOOL bFileIsOpen = FALSE;
+
+    if (!(bFileIsOpen = sourceFile.Open(L"screenshot.bmp",
+        CFile::modeRead | CFile::typeBinary, &fe)))
+    {
+        TCHAR strCause[256];
+        fe.GetErrorMessage(strCause, 255);
+        TRACE("SendFileToRemoteRecipient encountered an error while opening the local file\n"
+            "\tFile name = %s\n\tCause = %s\n\tm_cause = %d\n\tm_IOsError = %d\n",
+            fe.m_strFileName, strCause, fe.m_cause, fe.m_lOsError);
+
+        /* you should handle the error here */
+
+        bRet = FALSE;
+        goto PreReturnCleanup;
+    }
+
+    // first send length of file
+
+    fileLength = sourceFile.GetLength();
+    fileLength = htonl(fileLength);
+
+    cbLeftToSend = sizeof(fileLength);
+
+    do
+    {
+        int cbBytesSent;
+        BYTE* bp = (BYTE*)(&fileLength) + sizeof(fileLength) - cbLeftToSend;
+        cbBytesSent = m_SendingSocket.Send(bp, cbLeftToSend);
+        // test for errors and get out if they occurred
+        if (cbBytesSent == SOCKET_ERROR)
+        {
+            int iErr = ::GetLastError();
+            TRACE("SendFileToRemoteRecipient returned a socket error while sending file length\n"
+                "\tNumber of Bytes sent = %d\n"
+                "\tGetLastError = %d\n", cbBytesSent, iErr);
+
+            /* you should handle the error here */
+
+            bRet = FALSE;
+            goto PreReturnCleanup;
+        }
+
+        // data was successfully sent, so account
+        // for it with already-sent data
+        cbLeftToSend -= cbBytesSent;
+    } while (cbLeftToSend > 0);
+
+
+    // now send the file's data    
+    sendData = new BYTE[SEND_BUFFER_SIZE];
+
+    cbLeftToSend = sourceFile.GetLength();
+
+    do
+    {
+        // read next chunk of SEND_BUFFER_SIZE bytes from file
+
+        int sendThisTime, doneSoFar, buffOffset;
+
+        sendThisTime = sourceFile.Read(sendData, SEND_BUFFER_SIZE);
+        buffOffset = 0;
+
+        do
+        {
+            doneSoFar = m_SendingSocket.Send(sendData + buffOffset,
+                sendThisTime);
+
+            // test for errors and get out if they occurred
+            if (doneSoFar == SOCKET_ERROR)
+            {
+                int iErr = ::GetLastError();
+                TRACE("SendFileToRemoteRecipient returned a socket error  while sending chunked file data\n"
+                    "\tNumber of Bytes sent = %d\n"
+                    "\tGetLastError = %d\n", doneSoFar, iErr);
+
+                /* you should handle the error here */
+
+                bRet = FALSE;
+                goto PreReturnCleanup;
+            }
+
+            // data was successfully sent,
+            // so account for it with already-sent data
+
+            buffOffset += doneSoFar;
+            sendThisTime -= doneSoFar;
+            cbLeftToSend -= doneSoFar;
+        } while (sendThisTime > 0);
+
+    } while (cbLeftToSend > 0);
+
+    PreReturnCleanup: // labelled goto destination
+
+    delete[] sendData;
+
+    if (bFileIsOpen)
+        sourceFile.Close();
 	CSocket::OnAccept(nErrorCode);
+}
+
+
+void CServerSocket::OnReceive(int nErrorCode)
+{
+    // TODO: Add your specialized code here and/or call the base class
+
+    CSocket::OnReceive(nErrorCode);
 }
