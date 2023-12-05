@@ -12,10 +12,12 @@ void CServerSocket::OnAccept(int nErrorCode)
 {
 	// TODO: Add your specialized code here and/or call the base class
 	//
-	m_SendingSocket.Close();
+	m_ReceivingSocket.Close();
 
     Accept(m_SendingSocket);
 	AfxMessageBox(_T("Connected"));
+
+
     // Get the dimensions of the primary display
     DEVMODE dm = { 0 };
     dm.dmSize = sizeof(dm);
@@ -175,4 +177,12 @@ void CServerSocket::OnAccept(int nErrorCode)
     if (bFileIsOpen)
         sourceFile.Close();
 	CSocket::OnAccept(nErrorCode);
+}
+
+
+void CServerSocket::OnReceive(int nErrorCode)
+{
+    // TODO: Add your specialized code here and/or call the base class
+
+    CSocket::OnReceive(nErrorCode);
 }
