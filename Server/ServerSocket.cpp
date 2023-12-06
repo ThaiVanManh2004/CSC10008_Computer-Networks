@@ -8,15 +8,10 @@
 //
 #define SEND_BUFFER_SIZE    4096
 
-void CServerSocket::OnAccept(int nErrorCode)
+void CServerSocket::OnReceive(int nErrorCode)
 {
-	// TODO: Add your specialized code here and/or call the base class
-	//
-	m_ReceivingSocket.Close();
-
-    Accept(m_SendingSocket);
-	AfxMessageBox(_T("Connected"));
-
+    char buff[3];
+    Receive(buff, 3);
 
     // Get the dimensions of the primary display
     DEVMODE dm = { 0 };
@@ -68,7 +63,9 @@ void CServerSocket::OnAccept(int nErrorCode)
     DeleteDC(hDC);
     ReleaseDC(NULL, hScreen);
 
-	//
+
+
+    // return value
     BOOL bRet = TRUE;
     // used to monitor the progress of a sending operation
     int fileLength, cbLeftToSend;
@@ -106,7 +103,8 @@ void CServerSocket::OnAccept(int nErrorCode)
     {
         int cbBytesSent;
         BYTE* bp = (BYTE*)(&fileLength) + sizeof(fileLength) - cbLeftToSend;
-        cbBytesSent = m_SendingSocket.Send(bp, cbLeftToSend);
+        cbBytesSent = this->Send(bp, cbLeftToSend);
+
         // test for errors and get out if they occurred
         if (cbBytesSent == SOCKET_ERROR)
         {
@@ -143,7 +141,7 @@ void CServerSocket::OnAccept(int nErrorCode)
 
         do
         {
-            doneSoFar = m_SendingSocket.Send(sendData + buffOffset,
+            doneSoFar = this->Send(sendData + buffOffset,
                 sendThisTime);
 
             // test for errors and get out if they occurred
@@ -170,19 +168,14 @@ void CServerSocket::OnAccept(int nErrorCode)
 
     } while (cbLeftToSend > 0);
 
-    PreReturnCleanup: // labelled goto destination
+PreReturnCleanup: // labelled goto destination
 
     delete[] sendData;
 
     if (bFileIsOpen)
         sourceFile.Close();
-	CSocket::OnAccept(nErrorCode);
-}
 
 
-void CServerSocket::OnReceive(int nErrorCode)
-{
-    // TODO: Add your specialized code here and/or call the base class
 
     CSocket::OnReceive(nErrorCode);
 }

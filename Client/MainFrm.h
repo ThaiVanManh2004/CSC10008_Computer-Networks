@@ -19,7 +19,8 @@ protected:
 public:
 	CButton cButton;
 	afx_msg void OnButtonClicked();
-	CStatic m_pictureCtrl;
+	CStatic* m_pictureCtrl = new CStatic;
 	afx_msg void OnDisplayImage();
+	bool create = false;
 //
 };

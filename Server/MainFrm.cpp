@@ -26,21 +26,20 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//
 	return 0;
 }
-
 //
 void CMainFrame::OnButtonClicked() {
-	((CServerApp*)AfxGetApp())->m_ServerSocket.Create();
-	((CServerApp*)AfxGetApp())->m_ServerSocket.Listen();
+	((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket.Create();
+	((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket.Listen();
 
-	((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket.Create(0, SOCK_DGRAM);
-	((CServerApp*)AfxGetApp())->m_ServerSocket.GetSockName(((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket.rSocketAddress, ((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket.rSocketPort);
-	((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket.SetSockOpt(SO_BROADCAST, "0", 0);
+	((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.Create(0, SOCK_DGRAM);
+	((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket.GetSockName(((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.rSocketAddress, ((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.rSocketPort);
+	((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.SetSockOpt(SO_BROADCAST, "0", 0);
 
 	CString errorMessage;
-	errorMessage.Format(_T("SendTo failed with error: %u"), ((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket.rSocketPort);
+	errorMessage.Format(_T("SendTo failed with error: %u"), ((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.rSocketPort);
 	AfxMessageBox(errorMessage);
-	while (((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket != INVALID_SOCKET) {
-		((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket.SendTo(&(((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket.rSocketPort), sizeof(UINT), 1, NULL);
+	while (((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket != INVALID_SOCKET) {
+		((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.SendTo(&(((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.rSocketPort), sizeof(UINT), 1, NULL);
 		AfxMessageBox(_T(""));
 	}
 }

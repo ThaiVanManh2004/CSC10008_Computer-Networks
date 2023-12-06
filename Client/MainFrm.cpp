@@ -36,7 +36,11 @@ void CMainFrame::OnDisplayImage()
 	CRect rect;
 	GetClientRect(&rect);
 	//CRect rect(0, 0, 1000, 2000);
-	m_pictureCtrl.Create(_T(""), WS_CHILD | WS_VISIBLE | SS_BITMAP, rect, this);
+	if (create == false) {
+		m_pictureCtrl->Create(_T(""), WS_CHILD | WS_VISIBLE | SS_BITMAP, rect, this);
+		create = true;
+	}
+
 
 	//ScreenToClient(&rect);
 	CImage m_image;
@@ -58,7 +62,7 @@ void CMainFrame::OnDisplayImage()
 	scaledImage.ReleaseDC();
 	m_image.ReleaseDC();
 
-	(&m_pictureCtrl)->SetBitmap(scaledImage.Detach());
+	(m_pictureCtrl)->SetBitmap(scaledImage.Detach());
 }
 //
 void CMainFrame::OnButtonClicked() {
@@ -67,8 +71,8 @@ void CMainFrame::OnButtonClicked() {
 	else {
 		((CClientApp*)AfxGetApp())->m_ClientSocket.Create();
 		((CClientApp*)AfxGetApp())->m_ClientSocket.Connect(((CClientApp*)AfxGetApp())->m_ClientSocket.m_ReceivingSocket.rSocketAddress, ((CClientApp*)AfxGetApp())->m_ClientSocket.m_ReceivingSocket.rSocketPort);
+		((CClientApp*)AfxGetApp())->m_ClientSocket.Send("TVM", 3);
 		((CClientApp*)AfxGetApp())->m_ClientSocket.m_ReceivingSocket.Close();
-		CMainFrame::OnDisplayImage();
 	}
 }
 //
