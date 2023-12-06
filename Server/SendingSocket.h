@@ -3,5 +3,10 @@
 class CSendingSocket :
     public CSocket
 {
+//
+public:
+    CString rSocketAddress;
+    UINT rSocketPort;
+//
 };
 

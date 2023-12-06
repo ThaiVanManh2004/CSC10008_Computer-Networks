@@ -16,9 +16,11 @@
 
 void CClientSocket::OnReceive(int nErrorCode)
 {
-	// TODO: Add your specialized code here and/or call the base class
+	// local variables used in file transfer (declared here to avoid
+	// "goto skips definition"-style compiler errors)
+
+	BOOL bRet = TRUE; // return value
 	// used to monitor the progress of a receive operation
-	BOOL bRet = TRUE;
 	int dataLength, cbBytesRet, cbLeftToReceive;
 	// pointer to buffer for receiving data
 	// (memory is allocated after obtaining file size)
@@ -44,7 +46,6 @@ void CClientSocket::OnReceive(int nErrorCode)
 		bRet = FALSE;
 		goto PreReturnCleanup;
 	}
-
 
 	// get the file's size first
 	cbLeftToReceive = sizeof(dataLength);
@@ -110,7 +111,7 @@ void CClientSocket::OnReceive(int nErrorCode)
 		cbLeftToReceive -= iiRecd;
 
 	} while (cbLeftToReceive > 0);
-
+	
 PreReturnCleanup: // labelled "goto" destination
 
 	// free allocated memory
@@ -119,10 +120,17 @@ PreReturnCleanup: // labelled "goto" destination
 	// is permissible under C++ standard and is harmless
 	delete[] recdData;
 
-	if (bFileIsOpen)
+	if (bFileIsOpen) {
 		destFile.Close();
-	((CClientApp*)AfxGetApp())->m_ClientSocket.Close();
+		bFileIsOpen = false;
+	}
+	if (!bFileIsOpen) {
+		((CMainFrame*)AfxGetMainWnd())->OnDisplayImage();
+	}
+	((CClientApp*)AfxGetApp())->m_ClientSocket.Send("TVM", 3);
+	// only close file if it's open (open might have failed above)
 
-	//============================Load image =============================
+
+	
 	CSocket::OnReceive(nErrorCode);
 }

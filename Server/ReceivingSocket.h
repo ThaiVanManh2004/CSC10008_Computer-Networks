@@ -3,9 +3,6 @@
 class CReceivingSocket :
     public CSocket
 {
-//
 public:
-    CString rSocketAddress;
-    UINT rSocketPort;
-//
+    virtual void OnAccept(int nErrorCode);
 };
