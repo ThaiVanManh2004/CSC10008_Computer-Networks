@@ -9,6 +9,8 @@
 #include <afxcmn.h>
 
 #include <Windows.h>
+#include <iostream>
+#include <fstream>
 #include <string>
 #include <atlimage.h>  // for CImage
 #include <gdiplus.h>
@@ -16,121 +18,43 @@
 
 void CClientSocket::OnReceive(int nErrorCode)
 {
-	// local variables used in file transfer (declared here to avoid
-	// "goto skips definition"-style compiler errors)
+	// Lấy thông tin bitmap từ dữ liệu nhận được
+	BITMAPINFOHEADER bmiHeader = { 0 };
+	bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bmiHeader.biPlanes = 1;
+	bmiHeader.biBitCount = 24; // 24-bit RGB
+	bmiHeader.biCompression = BI_RGB;
+	bmiHeader.biSizeImage = 0;
 
-	BOOL bRet = TRUE; // return value
-	// used to monitor the progress of a receive operation
-	int dataLength, cbBytesRet, cbLeftToReceive;
-	// pointer to buffer for receiving data
-	// (memory is allocated after obtaining file size)
-	BYTE* recdData = NULL;
-
-	CFile destFile;
-	CFileException fe;
-	BOOL bFileIsOpen = FALSE;
-
-	// open/create target file that receives the transferred data
-
-	if (!(bFileIsOpen = destFile.Open(L"screenshot1.bmp", CFile::modeCreate |
-		CFile::modeWrite | CFile::typeBinary, &fe)))
-	{
-		TCHAR strCause[256];
-		fe.GetErrorMessage(strCause, 255);
-		TRACE("GetFileFromRemoteSender encountered an error while opening the local file\n"
-			"\tFile name = %s\n\tCause = %s\n\tm_cause = %d\n\tm_IOsError = %d\n",
-			fe.m_strFileName, strCause, fe.m_cause, fe.m_lOsError);
-
-		/* you should handle the error here */
-
-		bRet = FALSE;
-		goto PreReturnCleanup;
+    Receive(&bmiHeader.biSizeImage, sizeof(bmiHeader.biSizeImage));
+	Receive(&bmiHeader.biWidth, sizeof(bmiHeader.biWidth));
+	Receive(&bmiHeader.biHeight, sizeof(bmiHeader.biHeight));
+    BYTE* imageData = new BYTE[bmiHeader.biSizeImage];
+    // Nhận dữ liệu ảnh từ server
+	int nByteReceived = 0;
+	while (nByteReceived < bmiHeader.biSizeImage) {
+		int n = Receive(imageData+nByteReceived, bmiHeader.biSizeImage-nByteReceived);
+		nByteReceived += n;
 	}
-
-	// get the file's size first
-	cbLeftToReceive = sizeof(dataLength);
-
-	do
-	{
-		BYTE* bp = (BYTE*)(&dataLength) + sizeof(dataLength) - cbLeftToReceive;
-		cbBytesRet = ((CClientApp*)AfxGetApp())->m_ClientSocket.Receive(bp, cbLeftToReceive);
-
-		// test for errors and get out if they occurred
-		if (cbBytesRet == SOCKET_ERROR || cbBytesRet == 0)
-		{
-			int iErr = ::GetLastError();
-			TRACE("GetFileFromRemoteSite returned a socket error while getting file length\n"
-				"\tNumber of Bytes received (zero means connection was closed) = %d\n"
-				"\tGetLastError = %d\n", cbBytesRet, iErr);
-
-			/* you should handle the error here */
-
-			bRet = FALSE;
-			goto PreReturnCleanup;
-		}
-
-		// good data was retrieved, so accumulate
-		// it with already-received data
-		cbLeftToReceive -= cbBytesRet;
-
-	} while (cbLeftToReceive > 0);
-
-	dataLength = ntohl(dataLength);
-
-	// now get the file in RECV_BUFFER_SIZE chunks at a time
-
-	recdData = new byte[RECV_BUFFER_SIZE];
-	cbLeftToReceive = dataLength;
-
-	do
-	{
-		int iiGet, iiRecd;
-
-		iiGet = (cbLeftToReceive < RECV_BUFFER_SIZE) ?
-			cbLeftToReceive : RECV_BUFFER_SIZE;
-		iiRecd = ((CClientApp*)AfxGetApp())->m_ClientSocket.Receive(recdData, iiGet);
-
-		// test for errors and get out if they occurred
-		if (iiRecd == SOCKET_ERROR || iiRecd == 0)
-		{
-			int iErr = ::GetLastError();
-			TRACE("GetFileFromRemoteSite returned a socket error while getting chunked file data\n"
-				"\tNumber of Bytes received (zero means connection was closed) = %d\n"
-				"\tGetLastError = %d\n", iiRecd, iErr);
-
-			/* you should handle the error here */
-
-			bRet = FALSE;
-			goto PreReturnCleanup;
-		}
-
-		// good data was retrieved, so accumulate
-		// it with already-received data
-
-		destFile.Write(recdData, iiRecd); // Write it
-		cbLeftToReceive -= iiRecd;
-
-	} while (cbLeftToReceive > 0);
+	// Chiếu ảnh lên màn hình
+	((CMainFrame*)AfxGetMainWnd())->cButton.ShowWindow(SW_HIDE);
+	CRect rect;
+	((CMainFrame*)AfxGetMainWnd())->GetClientRect(&rect);
+	double scaleX = (double)rect.Width() / (double)bmiHeader.biWidth;
+	double scaleY = (double)rect.Height() / (double)(-bmiHeader.biHeight);
+	double scale = min(scaleX, scaleY);
+	int newWidth = (int)(scale * bmiHeader.biWidth);
+	int newHeight = (int)(scale * (-bmiHeader.biHeight));
+	HWND hWnd = FindWindow(NULL, _T("DMP Client"));
+	HDC hScreenDC = GetDC(hWnd);
+	int n = StretchDIBits(hScreenDC, (bmiHeader.biWidth-newWidth)/2, 0, newWidth, newHeight, 0, 0, bmiHeader.biWidth, -bmiHeader.biHeight, imageData, (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS, SRCCOPY);
 	
-PreReturnCleanup: // labelled "goto" destination
 
-	// free allocated memory
-	// if we got here from a goto that skipped allocation,
-	// delete of NULL pointer
-	// is permissible under C++ standard and is harmless
-	delete[] recdData;
-
-	if (bFileIsOpen) {
-		destFile.Close();
-		bFileIsOpen = false;
-	}
-	if (!bFileIsOpen) {
-		((CMainFrame*)AfxGetMainWnd())->OnDisplayImage();
-	}
+ //   // Giải phóng bộ nhớ của mảng dữ liệu ảnh
+    delete[] imageData;
+	//Sleep(3000);
 	((CClientApp*)AfxGetApp())->m_ClientSocket.Send("TVM", 3);
-	// only close file if it's open (open might have failed above)
 
-
-	
+	//
 	CSocket::OnReceive(nErrorCode);
 }
