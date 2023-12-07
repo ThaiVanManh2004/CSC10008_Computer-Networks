@@ -17,6 +17,9 @@ CServerSocket::CServerSocket() noexcept {
     imageData = new BYTE[bmiHeader.biSizeImage];
 }
 CServerSocket::~CServerSocket() {
+    DeleteObject(hBitmap);
+    DeleteDC(hMemoryDC);
+    ReleaseDC(NULL, hScreenDC);
     delete[]imageData;
 }
 void CServerSocket::OnReceive(int nErrorCode)
