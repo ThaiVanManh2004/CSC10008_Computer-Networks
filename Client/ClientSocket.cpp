@@ -1,0 +1,63 @@
+﻿
+#include "pch.h"
+#include "ClientSocket.h"
+#include "Client.h"
+#define RECV_BUFFER_SIZE 4096
+#define IDC_IMAGE 1013
+#include "afxdialogex.h"
+#include <afxwin.h>
+#include <afxcmn.h>
+
+#include <Windows.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <atlimage.h>  // for CImage
+#include <gdiplus.h>
+#include "MainFrm.h"
+
+
+CClientSocket::CClientSocket() noexcept {
+
+}
+CClientSocket::~CClientSocket() {
+
+}
+void CClientSocket::OnReceive(int nErrorCode)
+{
+	Receive(&bmiHeader.biWidth, sizeof(bmiHeader.biWidth));
+	Receive(&bmiHeader.biHeight, sizeof(bmiHeader.biHeight));
+	bmiHeader.biSizeImage = ((bmiHeader.biWidth * 24 + 31) & ~31) / 8 * (-bmiHeader.biHeight);
+
+	if (newHeight == 0) {
+		CRect rect;
+		((CMainFrame*)AfxGetMainWnd())->GetClientRect(&rect);
+		double scaleX = (double)rect.Width() / (double)bmiHeader.biWidth;
+		double scaleY = (double)rect.Height() / (double)(-bmiHeader.biHeight);
+		double scale = min(scaleX, scaleY);
+		newWidth = (int)(scale * bmiHeader.biWidth);
+		newHeight = (int)(scale * (-bmiHeader.biHeight));
+		((CMainFrame*)AfxGetMainWnd())->cButton.ShowWindow(SW_HIDE);
+
+		// Chiếu ảnh lên màn hình
+		
+	}
+	
+    // Nhận dữ liệu ảnh từ server
+	int nByteReceived = 0;
+	while (nByteReceived < bmiHeader.biSizeImage) {
+		int n = Receive(imageData + nByteReceived, bmiHeader.biSizeImage-nByteReceived);
+		nByteReceived += n;
+	}
+	HWND hWnd = FindWindow(NULL, _T("DMP Client"));
+	hScreenDC = GetDC(hWnd);
+	
+	StretchDIBits(hScreenDC, (bmiHeader.biWidth-newWidth)/2, 0, newWidth, newHeight, 0, 0, bmiHeader.biWidth, -bmiHeader.biHeight, imageData, (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS, SRCCOPY);
+	
+
+	//Sleep(3000);
+	this->Send("M", 1);
+	ReleaseDC(NULL, hScreenDC);
+	//
+	CSocket::OnReceive(nErrorCode);
+}
