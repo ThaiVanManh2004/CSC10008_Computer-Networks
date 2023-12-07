@@ -16,45 +16,48 @@
 #include <gdiplus.h>
 #include "MainFrm.h"
 
+
+CClientSocket::CClientSocket() noexcept {
+
+}
+CClientSocket::~CClientSocket() {
+
+}
 void CClientSocket::OnReceive(int nErrorCode)
 {
-	// Lấy thông tin bitmap từ dữ liệu nhận được
-	BITMAPINFOHEADER bmiHeader = { 0 };
-	bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmiHeader.biPlanes = 1;
-	bmiHeader.biBitCount = 24; // 24-bit RGB
-	bmiHeader.biCompression = BI_RGB;
-	bmiHeader.biSizeImage = 0;
-
-    Receive(&bmiHeader.biSizeImage, sizeof(bmiHeader.biSizeImage));
 	Receive(&bmiHeader.biWidth, sizeof(bmiHeader.biWidth));
 	Receive(&bmiHeader.biHeight, sizeof(bmiHeader.biHeight));
-    BYTE* imageData = new BYTE[bmiHeader.biSizeImage];
+	bmiHeader.biSizeImage = ((bmiHeader.biWidth * 24 + 31) & ~31) / 8 * (-bmiHeader.biHeight);
+
+	if (newHeight == 0) {
+		CRect rect;
+		((CMainFrame*)AfxGetMainWnd())->GetClientRect(&rect);
+		double scaleX = (double)rect.Width() / (double)bmiHeader.biWidth;
+		double scaleY = (double)rect.Height() / (double)(-bmiHeader.biHeight);
+		double scale = min(scaleX, scaleY);
+		newWidth = (int)(scale * bmiHeader.biWidth);
+		newHeight = (int)(scale * (-bmiHeader.biHeight));
+		((CMainFrame*)AfxGetMainWnd())->cButton.ShowWindow(SW_HIDE);
+
+		// Chiếu ảnh lên màn hình
+		
+	}
+	
     // Nhận dữ liệu ảnh từ server
 	int nByteReceived = 0;
 	while (nByteReceived < bmiHeader.biSizeImage) {
-		int n = Receive(imageData+nByteReceived, bmiHeader.biSizeImage-nByteReceived);
+		int n = Receive(imageData + nByteReceived, bmiHeader.biSizeImage-nByteReceived);
 		nByteReceived += n;
 	}
-	// Chiếu ảnh lên màn hình
-	((CMainFrame*)AfxGetMainWnd())->cButton.ShowWindow(SW_HIDE);
-	CRect rect;
-	((CMainFrame*)AfxGetMainWnd())->GetClientRect(&rect);
-	double scaleX = (double)rect.Width() / (double)bmiHeader.biWidth;
-	double scaleY = (double)rect.Height() / (double)(-bmiHeader.biHeight);
-	double scale = min(scaleX, scaleY);
-	int newWidth = (int)(scale * bmiHeader.biWidth);
-	int newHeight = (int)(scale * (-bmiHeader.biHeight));
 	HWND hWnd = FindWindow(NULL, _T("DMP Client"));
-	HDC hScreenDC = GetDC(hWnd);
-	int n = StretchDIBits(hScreenDC, (bmiHeader.biWidth-newWidth)/2, 0, newWidth, newHeight, 0, 0, bmiHeader.biWidth, -bmiHeader.biHeight, imageData, (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS, SRCCOPY);
+	hScreenDC = GetDC(hWnd);
+	
+	StretchDIBits(hScreenDC, (bmiHeader.biWidth-newWidth)/2, 0, newWidth, newHeight, 0, 0, bmiHeader.biWidth, -bmiHeader.biHeight, imageData, (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS, SRCCOPY);
 	
 
- //   // Giải phóng bộ nhớ của mảng dữ liệu ảnh
-    delete[] imageData;
 	//Sleep(3000);
-	((CClientApp*)AfxGetApp())->m_ClientSocket.Send("TVM", 3);
-
+	this->Send("M", 1);
+	ReleaseDC(NULL, hScreenDC);
 	//
 	CSocket::OnReceive(nErrorCode);
 }
