@@ -27,11 +27,12 @@ void CClientSocket::OnReceive(int nErrorCode)
 {
 	Receive(&bmiHeader.biWidth, sizeof(bmiHeader.biWidth));
 	Receive(&bmiHeader.biHeight, sizeof(bmiHeader.biHeight));
+
 	bmiHeader.biSizeImage = ((bmiHeader.biWidth * 24 + 31) & ~31) / 8 * (-bmiHeader.biHeight);
 
 	if (newHeight == 0) {
 		CRect rect;
-		((CMainFrame*)AfxGetMainWnd())->GetClientRect(&rect);
+		AfxGetMainWnd()->GetClientRect(&rect);
 		double scaleX = (double)rect.Width() / (double)bmiHeader.biWidth;
 		double scaleY = (double)rect.Height() / (double)(-bmiHeader.biHeight);
 		double scale = min(scaleX, scaleY);
@@ -49,15 +50,11 @@ void CClientSocket::OnReceive(int nErrorCode)
 		int n = Receive(imageData + nByteReceived, bmiHeader.biSizeImage-nByteReceived);
 		nByteReceived += n;
 	}
-	HWND hWnd = FindWindow(NULL, _T("DMP Client"));
-	hScreenDC = GetDC(hWnd);
+	hScreenDC = GetDC(AfxGetMainWnd()->GetSafeHwnd());
 	
 	StretchDIBits(hScreenDC, (bmiHeader.biWidth-newWidth)/2, 0, newWidth, newHeight, 0, 0, bmiHeader.biWidth, -bmiHeader.biHeight, imageData, (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS, SRCCOPY);
-	
 
-	//Sleep(3000);
-	this->Send("M", 1);
 	ReleaseDC(NULL, hScreenDC);
-	//
+	this->Send("M", 1);
 	CSocket::OnReceive(nErrorCode);
 }

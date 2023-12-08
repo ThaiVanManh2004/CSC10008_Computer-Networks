@@ -6,9 +6,6 @@
 #include <iostream>
 #include <fstream>
 #include "MainFrm.h"
-#include <string>
-//
-#define SEND_BUFFER_SIZE    4096
 
 CServerSocket::CServerSocket() noexcept {
     bmiHeader.biWidth = GetSystemMetrics(SM_CXSCREEN);
