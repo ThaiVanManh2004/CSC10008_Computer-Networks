@@ -25,6 +25,7 @@ CClientSocket::~CClientSocket() {
 }
 void CClientSocket::OnReceive(int nErrorCode)
 {
+	Sleep(8);
 	Receive(&bmiHeader.biWidth, sizeof(bmiHeader.biWidth));
 	Receive(&bmiHeader.biHeight, sizeof(bmiHeader.biHeight));
 
@@ -55,6 +56,5 @@ void CClientSocket::OnReceive(int nErrorCode)
 	StretchDIBits(hScreenDC, (bmiHeader.biWidth-newWidth)/2, 0, newWidth, newHeight, 0, 0, bmiHeader.biWidth, -bmiHeader.biHeight, imageData, (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS, SRCCOPY);
 
 	ReleaseDC(NULL, hScreenDC);
-	this->Send("M", 1);
 	CSocket::OnReceive(nErrorCode);
 }

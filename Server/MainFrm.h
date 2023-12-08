@@ -14,10 +14,11 @@ protected: // create from serialization only
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	DECLARE_MESSAGE_MAP()
-
 //
 protected:
 	CButton cButton;
 	afx_msg void OnButtonClicked();
+public:
+	void OnStream();
 //
 };

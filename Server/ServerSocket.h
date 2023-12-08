@@ -13,8 +13,8 @@ public:
 public:
     CSendingSocket m_SendingSocket;
     CReceivingSocket m_ReceivingSocket;
-    virtual void OnReceive(int nErrorCode);
-
+    //virtual void OnReceive(int nErrorCode);
+    void OnStream();
 
     BITMAPINFOHEADER bmiHeader = { 40, 0,0,1,24,BI_RGB,0 };
     BYTE* imageData;

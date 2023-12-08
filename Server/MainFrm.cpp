@@ -1,4 +1,4 @@
-
+﻿
 // MainFrm.cpp : implementation of the CMainFrame class
 //
 
@@ -6,6 +6,7 @@
 #include "Server.h"
 
 #include "MainFrm.h"
+#include <thread>
 
 // CMainFrame
 
@@ -27,6 +28,13 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 //
+
+void CMainFrame::OnStream() {
+	std::thread thread_stream([&]() {
+		((CServerApp*)AfxGetApp())->m_ServerSocket.OnStream();
+	});
+	thread_stream.detach();
+}
 void CMainFrame::OnButtonClicked() {
 	((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket.Create();
 	((CServerApp*)AfxGetApp())->m_ServerSocket.m_ReceivingSocket.Listen();

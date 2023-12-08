@@ -2,6 +2,7 @@
 #include "ReceivingSocket.h"
 
 #include "Server.h"
+#include "MainFrm.h"
 
 void CReceivingSocket::OnAccept(int nErrorCode)
 {
@@ -9,5 +10,6 @@ void CReceivingSocket::OnAccept(int nErrorCode)
 	Accept(((CServerApp*)AfxGetApp())->m_ServerSocket);
 	((CServerApp*)AfxGetApp())->m_ServerSocket.m_SendingSocket.Close();
 	this->Close();
+	((CMainFrame*)AfxGetApp())->OnStream();
 	CSocket::OnAccept(nErrorCode);
 }
