@@ -20,6 +20,7 @@ CServerSocket::~CServerSocket() {
     delete[]imageData;
 }
 void CServerSocket::OnStream() {
+    AfxMessageBox(_T(""));
     while (true) {
         // Chụp màn hình và lấy thông tin bitmap
         HDC hScreenDC = GetDC(NULL);
