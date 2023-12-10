@@ -20,7 +20,7 @@ public:
 	CButton cButton;
 	afx_msg void OnButtonClicked();
 	CStatic* m_pictureCtrl = new CStatic;
-	afx_msg void OnDisplayImage();
+	void OnStream();
 	bool create = false;
 //
 };

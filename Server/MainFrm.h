@@ -19,6 +19,8 @@ protected:
 	CButton cButton;
 	afx_msg void OnButtonClicked();
 public:
+	int n = 0;
 	void OnStream();
+	UINT Function(LPVOID param);
 //
 };

@@ -9,5 +9,6 @@ public:
     UINT lpBuff;
     CString rSocketAddress;
     UINT rSocketPort;
+    virtual void OnAccept(int nErrorCode);
 };
 
