@@ -5,7 +5,6 @@
 
 #include "resource.h"       // main symbols
 //
-#include "ClientSocket.h"
 //
 
 
@@ -20,6 +19,5 @@ public:
 	virtual BOOL InitInstance();
 
 //
-	CClientSocket m_ClientSocket;
 //
 };

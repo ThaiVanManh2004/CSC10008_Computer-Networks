@@ -3,5 +3,4 @@
 class CReceivingSocket :
     public CSocket
 {
-public:
 };

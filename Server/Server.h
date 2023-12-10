@@ -4,9 +4,6 @@
 #pragma once
 
 #include "resource.h"       // main symbols
-//
-#include "ServerSocket.h"
-//
 
 
 // CServerApp:
@@ -19,7 +16,4 @@ class CServerApp : public CWinAppEx
 public:
 	virtual BOOL InitInstance();
 
-//
-	CServerSocket m_ServerSocket;
-//
 };

@@ -19,6 +19,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_WM_CREATE()
 	//
 	ON_BN_CLICKED(IDC_BUTTON, OnButtonClicked)
+	ON_WM_LBUTTONUP()
 	//
 	//ON_COMMAND(ID_DISPLAY_IMAGE, OnDisplayImage) 
 	//
@@ -31,73 +32,33 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	cButton.ShowWindow(SW_SHOWMAXIMIZED);
 	return 0;
 }
-void CMainFrame::OnStream() {
-
-	std::thread thread_stream([&]() {
-		((CClientApp*)AfxGetApp())->m_ClientSocket.OnStream();
-		});
-	thread_stream.detach();
+void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point) {
+	CWnd::OnLButtonUp(nFlags, point);
+	CRect rect;
+	GetClientRect(rect);
+	double scale = (double)GetSystemMetrics(SM_CXSCREEN) / GetSystemMetrics(SM_CYSCREEN);
+	int width = rect.Height() * scale;
+	int height = rect.Height();
+	if (point.x< (GetSystemMetrics(SM_CXSCREEN) - width) / 2 || point.x>(GetSystemMetrics(SM_CXSCREEN) - width) / 2 + width) {
+		return;
+	}
+	else {
+		point.x = point.x - (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
+		point.x = (double)point.x / width * GetSystemMetrics(SM_CXSCREEN);
+		point.y = (double)point.y / height * GetSystemMetrics(SM_CYSCREEN);
+		m_ClientSocket.SendTo(&point.x, sizeof(point.x), rSocketPort, rSocketAddress);
+		m_ClientSocket.SendTo(&point.y, sizeof(point.y), rSocketPort, rSocketAddress);
+	}
 }
-//void PrintScreen(BITMAPINFOHEADER bmiHeader, BYTE* lpvBits) {
-//	HDC hScreenDC = GetDC(AfxGetMainWnd()->GetSafeHwnd());
-//
-//	StretchDIBits(hScreenDC, 0, 0, bmiHeader.biWidth, -bmiHeader.biHeight, 0, 0, bmiHeader.biWidth, -bmiHeader.biHeight, lpvBits, (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS, SRCCOPY);
-//
-//	ReleaseDC(NULL, hScreenDC);
-//}
 void CMainFrame::OnButtonClicked() {
-	CReceivingThread* thread = new CReceivingThread;
-	thread->CreateThread();
-
-	//CSocket ReceivingSocket;
-	//ReceivingSocket.Create(1, SOCK_DGRAM);
-	//CString rSocketAddress;
-	//UINT rSocketPort;
-	//UINT lpBuf;
-	//ReceivingSocket.ReceiveFrom(&lpBuf, 4, rSocketAddress, rSocketPort);
-	//AfxMessageBox(rSocketAddress);
-	//CString cString;
-	//cString.Format(_T("%u %u"), lpBuf, rSocketPort);
-	//AfxMessageBox(cString);
-	//CSocket ClientSocket;
-	//ClientSocket.Create();
-	//while(ClientSocket.Connect(rSocketAddress, lpBuf)==0);
-	//AfxMessageBox(_T("Client"));
-	//CRect cRect;
-	//GetClientRect(cRect);
-	//BITMAPINFOHEADER bmiHeader = { 40, 0, 0, 1, 24, BI_RGB, 0 };
-	//bmiHeader.biWidth = cRect.Width();
-	//ClientSocket.SendTo(&bmiHeader.biWidth, sizeof(bmiHeader.biWidth), rSocketPort, rSocketAddress);
-	//bmiHeader.biHeight = -cRect.Height();
-	//ClientSocket.SendTo(&bmiHeader.biHeight, sizeof(bmiHeader.biHeight), rSocketPort, rSocketAddress);
-	//bmiHeader.biSizeImage = ((bmiHeader.biWidth * 24 + 31) & ~31) / 8 * (-bmiHeader.biHeight);
-	//BYTE* lpvBits = new BYTE[bmiHeader.biSizeImage];
-	//int bufferSize = 1000;
-	//ClientSocket.SetSockOpt(SO_RCVBUF, &bufferSize, sizeof(bufferSize), SOL_SOCKET);
-	//int nByteReceived;
-	//		nByteReceived = 0;
-	//		while (nByteReceived < bmiHeader.biSizeImage) {
-	//			nByteReceived += ClientSocket.ReceiveFrom(lpvBits + nByteReceived, (bmiHeader.biSizeImage - nByteReceived > 1000) ? 1000 : (bmiHeader.biSizeImage - nByteReceived), rSocketAddress, rSocketPort);
-	//			CString str;
-	//			str.Format(_T("%d"), nByteReceived);
-	//			AfxMessageBox(str);
-	//		}
-	//		PrintScreen(bmiHeader, lpvBits);
-		
-		
-	// 
-	// 
-	// 
-	// 
-	// 
-	//if (((CClientApp*)AfxGetApp())->m_ClientSocket.m_ReceivingSocket == INVALID_SOCKET)
-	//	((CClientApp*)AfxGetApp())->m_ClientSocket.m_ReceivingSocket.Create(1, SOCK_DGRAM);
-	//else {
-	//	((CClientApp*)AfxGetApp())->m_ClientSocket.Create();
-	//	((CClientApp*)AfxGetApp())->m_ClientSocket.Connect(((CClientApp*)AfxGetApp())->m_ClientSocket.m_ReceivingSocket.rSocketAddress, ((CClientApp*)AfxGetApp())->m_ClientSocket.m_ReceivingSocket.rSocketPort);
-	//	((CClientApp*)AfxGetApp())->m_ClientSocket.m_ReceivingSocket.Close();
-	//	AfxMessageBox(_T(""));
-	//	OnStream();
-	//}
+	m_ReceivingThread.CreateThread();
+	cButton.ShowWindow(SW_HIDE);
+	AfxMessageBox(_T("Waiting"));
+	m_ClientSocket.Create(2, SOCK_DGRAM);
+	m_ClientSocket.ReceiveFrom(NULL, 0, rSocketAddress, rSocketPort);
+	AfxMessageBox(rSocketAddress);
+	CString str;
+	str.Format(_T("%u"), rSocketPort);
+	AfxMessageBox(str);
 }
 //

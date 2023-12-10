@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "SendingThread.h"
+#include <thread>
+#include <ctime>
 
 
 BOOL CSendingThread::InitInstance()
@@ -29,33 +31,28 @@ int CSendingThread::Run()
 	m_ReceivingSocket.GetSockName(rSocketAddress, rSocketPort);
 	m_SendingSocket.SetSockOpt(SO_BROADCAST, "0", 0);
 	m_SendingSocket.SendTo(&rSocketPort, 4, 1, NULL);
+	m_SendingSocket.Close();
 	m_ReceivingSocket.Accept(m_ServerSocket);
+	m_ReceivingSocket.Close();
 	BITMAPINFOHEADER bmiHeader = { 40, 0, 0, 1, 24, BI_RGB, 0 };
 	m_ServerSocket.Receive(&bmiHeader.biWidth, sizeof(bmiHeader.biWidth));
 	m_ServerSocket.Receive(&bmiHeader.biHeight, sizeof(bmiHeader.biHeight));
 	bmiHeader.biSizeImage = ((bmiHeader.biWidth * 24 + 31) & ~31) / 8 * (-bmiHeader.biHeight);
 	BYTE* lpvBits = new BYTE[bmiHeader.biSizeImage];
+	int nBufferSize = 100;
+	m_ServerSocket.SetSockOpt(SO_SNDBUF, &nBufferSize, sizeof(nBufferSize), SOL_SOCKET);
 	while (true) {
-
 		CapScreen(bmiHeader, lpvBits);
 		int nByteSent = 0;
 		while (nByteSent < bmiHeader.biSizeImage) {
-			nByteSent += m_ServerSocket.Send(lpvBits + nByteSent, bmiHeader.biSizeImage - nByteSent);
+			int n= m_ServerSocket.Send(lpvBits + nByteSent, bmiHeader.biSizeImage - nByteSent);
+			if (n == 0) exit(0);
+			nByteSent += n;
+
 		}
+
 	}
-	//CString str;
-	//str.Format(_T("%d"), nByteSent);
-	//AfxMessageBox(str);
-	//BITMAPINFOHEADER bmiHeader = { 40, 0, 0, 1, 24, BI_RGB, 0 };
-	//ServerSocket.ReceiveFrom(&bmiHeader.biWidth, sizeof(bmiHeader.biWidth), rSocketAddress, rSocketPort);
-	//ServerSocket.Receive(&bmiHeader.biHeight, sizeof(bmiHeader.biHeight));
-	//bmiHeader.biSizeImage = ((bmiHeader.biWidth * 24 + 31) & ~31) / 8 * (-bmiHeader.biHeight);
-	//AfxMessageBox(rSocketAddress);
-	//BOOL bBroadcast = FALSE;
-	//ServerSocket.SetSockOpt(SO_BROADCAST, &bBroadcast, sizeof(bBroadcast), SOL_SOCKET);
-	//int bufferSize = 1000;
-	//ServerSocket.SetSockOpt(SO_SNDBUF, &bufferSize, sizeof(bufferSize), SOL_SOCKET);
-	//BYTE* lpvBits = new BYTE[bmiHeader.biSizeImage];
+
 	return CWinThread::Run();
 }
 
