@@ -3,6 +3,8 @@
 //
 
 #pragma once
+#include "ServerSocket.h"
+#include "SendingThread.h"
 
 class CMainFrame : public CFrameWndEx
 {
@@ -18,9 +20,7 @@ protected:
 protected:
 	CButton cButton;
 	afx_msg void OnButtonClicked();
-public:
-	int n = 0;
-	void OnStream();
-	UINT Function(LPVOID param);
+	CSendingThread m_SendingThread;
+	CServerSocket m_ServerSocket;
 //
 };

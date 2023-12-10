@@ -1,77 +1,33 @@
 ﻿#include "pch.h"
 #include "ServerSocket.h"
-//
-#include "Server.h"
 #include <Windows.h>
-#include <iostream>
-#include <fstream>
-#include "MainFrm.h"
 
-CServerSocket::CServerSocket() noexcept {
-    bmiHeader.biWidth = GetSystemMetrics(SM_CXSCREEN);
-    bmiHeader.biHeight = -GetSystemMetrics(SM_CYSCREEN);
-    bmiHeader.biSizeImage = ((bmiHeader.biWidth * 24 + 31) & ~31) / 8 * (-bmiHeader.biHeight);
-    imageData = new BYTE[bmiHeader.biSizeImage];
+
+void MouseClick(int x, int y) {
+    INPUT input[2] = {};
+
+    // Thiết lập bản tin cho sự kiện nhấn nút chuột
+    input[0].type = INPUT_MOUSE;
+    input[0].mi.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE | MOUSEEVENTF_LEFTDOWN;
+    input[0].mi.dx = x * (65535 / GetSystemMetrics(SM_CXSCREEN));
+    input[0].mi.dy = y * (65535 / GetSystemMetrics(SM_CYSCREEN));
+
+    // Thiết lập bản tin cho sự kiện thả nút chuột
+    input[1].type = INPUT_MOUSE;
+    input[1].mi.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE | MOUSEEVENTF_LEFTUP;
+    input[1].mi.dx = x * (65535 / GetSystemMetrics(SM_CXSCREEN));
+    input[1].mi.dy = y * (65535 / GetSystemMetrics(SM_CYSCREEN));
+
+    // Gửi bản tin đầu vào
+    SendInput(2, input, sizeof(INPUT));
 }
-CServerSocket::~CServerSocket() {
-    DeleteObject(hBitmap);
-    DeleteDC(hMemoryDC);
-    ReleaseDC(NULL, hScreenDC);
-    delete[]imageData;
+void CServerSocket::OnReceive(int nErrorCode)
+{
+	// TODO: Add your specialized code here and/or call the base class
+    int width;
+	Receive(&width, sizeof(width));
+    int height;
+    Receive(&height, sizeof(height));
+    MouseClick(width, height);
+	CSocket::OnReceive(nErrorCode);
 }
-void CServerSocket::OnStream() {
-    AfxMessageBox(_T(""));
-    while (true) {
-        // Chụp màn hình và lấy thông tin bitmap
-        HDC hScreenDC = GetDC(NULL);
-        HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
-        HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, bmiHeader.biWidth, -bmiHeader.biHeight);
-        HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemoryDC, hBitmap);
-        BitBlt(hMemoryDC, 0, 0, bmiHeader.biWidth, -bmiHeader.biHeight, hScreenDC, 0, 0, SRCCOPY);
-        GetDIBits(hMemoryDC, hBitmap, 0, -bmiHeader.biHeight, imageData, (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS);
-        this->Send(&bmiHeader.biWidth, sizeof(bmiHeader.biWidth));
-        this->Send(&bmiHeader.biHeight, sizeof(bmiHeader.biHeight));
-        nByteSent = 0;
-        while (nByteSent < bmiHeader.biSizeImage) {
-            int n = this->Send(imageData + nByteSent, bmiHeader.biSizeImage - nByteSent);
-
-            nByteSent += n;
-        }
-
-
-
-        // Giải phóng bộ nhớ
-        //SelectObject(hMemoryDC, hOldBitmap);
-        DeleteObject(hBitmap);
-        DeleteDC(hMemoryDC);
-        ReleaseDC(NULL, hScreenDC);
-
-        Sleep(8);
-    }
-}
-//void CServerSocket::OnReceive(int nErrorCode)
-//{
-//    char buff[1];
-//    Receive(buff, 1);
-//
-//    // Chụp màn hình và lấy thông tin bitmap
-//    HDC hScreenDC = GetDC(NULL);
-//    HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
-//    HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, bmiHeader.biWidth, -bmiHeader.biHeight);
-//    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemoryDC, hBitmap);
-//    BitBlt(hMemoryDC, 0, 0, bmiHeader.biWidth, -bmiHeader.biHeight, hScreenDC, 0, 0, SRCCOPY);
-//    GetDIBits(hMemoryDC, hBitmap, 0, -bmiHeader.biHeight, imageData, (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS);
-//    this->Send(&bmiHeader.biWidth, sizeof(bmiHeader.biWidth));
-//    this->Send(&bmiHeader.biHeight, sizeof(bmiHeader.biHeight));
-//    nByteSent = 0;
-//    while (nByteSent < bmiHeader.biSizeImage) {
-//        int n = this->Send(imageData + nByteSent, bmiHeader.biSizeImage - nByteSent);
-//        nByteSent += n;
-//    }
-//    // Giải phóng bộ nhớ
-//    SelectObject(hMemoryDC, hOldBitmap);
-//    DeleteObject(hBitmap);
-//    DeleteDC(hMemoryDC);
-//    ReleaseDC(NULL, hScreenDC);
-//    CSocket::OnReceive(nErrorCode);
-//}

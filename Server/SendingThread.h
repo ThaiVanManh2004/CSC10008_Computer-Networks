@@ -1,16 +1,14 @@
 #pragma once
 #include <afxwin.h>
-#include "ServerSocket.h"
-#include "SendingSocket.h"
-#include "ReceivingSocket.h"
+#include <afxsock.h>
 
 class CSendingThread :
     public CWinThread
 {
 public:
-    CServerSocket m_ServerSocket;
-    CSendingSocket m_SendingSocket;
-    CReceivingSocket m_ReceivingSocket;
+    CSocket m_ServerSocket;
+    CSocket m_SendingSocket;
+    CSocket m_ReceivingSocket;
 public:
     virtual BOOL InitInstance();
     virtual int Run();

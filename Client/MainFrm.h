@@ -1,8 +1,9 @@
 ﻿
 // MainFrm.h : interface of the CMainFrame class
 //
-
 #pragma once
+#include "ReceivingThread.h"
+#include <afxsock.h>
 
 class CMainFrame : public CFrameWndEx
 {
@@ -19,8 +20,10 @@ protected:
 public:
 	CButton cButton;
 	afx_msg void OnButtonClicked();
-	CStatic* m_pictureCtrl = new CStatic;
-	void OnStream();
-	bool create = false;
+	CReceivingThread m_ReceivingThread;
+	CSocket m_ClientSocket;
+	CString rSocketAddress;
+	UINT rSocketPort;
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 //
 };
