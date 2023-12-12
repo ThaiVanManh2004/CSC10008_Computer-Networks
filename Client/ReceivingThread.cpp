@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "ReceivingThread.h"
-#include <thread>
+#include <opencv2/opencv.hpp>
 
 BOOL CReceivingThread::InitInstance()
 {
@@ -8,13 +8,8 @@ BOOL CReceivingThread::InitInstance()
 
 	return true;
 }
-void PrintScreen(BITMAPINFOHEADER bmiHeader, BYTE* lpvBits) {
-	HDC hScreenDC = GetDC(AfxGetMainWnd()->GetSafeHwnd());
 
-	StretchDIBits(hScreenDC, (GetSystemMetrics(SM_CXSCREEN) - bmiHeader.biWidth) / 2, 0,bmiHeader.biWidth, -bmiHeader.biHeight, 0, 0, bmiHeader.biWidth, -bmiHeader.biHeight, lpvBits, (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS, SRCCOPY);
 
-	ReleaseDC(NULL, hScreenDC);
-}
 int CReceivingThread::Run()
 {
 	// TODO: Add your specialized code here and/or call the base class
@@ -24,34 +19,32 @@ int CReceivingThread::Run()
 	CString rSocketAddress;
 	UINT rSocketPort;
 	m_ReceivingSocket.ReceiveFrom(&lpBuf, 4, rSocketAddress, rSocketPort);
-	//AfxMessageBox(rSocketAddress);
-	//CString cString;
-	//cString.Format(_T("%u"), lpBuf);
-	//AfxMessageBox(cString);
 	m_ClientSocket.Connect(rSocketAddress, lpBuf);
+	m_ReceivingSocket.Close();
+	BITMAPINFOHEADER lpbmi = { 40, 0, 0, 1, 24, BI_RGB };
+	m_ClientSocket.SetSockOpt(TCP_NODELAY, "0", 0);
+	int lpOptionValue = 1000;
+	m_ClientSocket.SetSockOpt(SO_RCVBUF, &lpOptionValue, 4);
+	m_ClientSocket.Receive(&lpbmi.biWidth, 4);
+	m_ClientSocket.Receive(&lpbmi.biHeight, 4);
+	int nBufLen;
+	int n;
+	cv::Mat lpBits;
+	HDC hdc = GetDC(AfxGetMainWnd()->GetSafeHwnd());
 	CRect cRect;
 	GetClientRect(GetMainWnd()->GetSafeHwnd(), cRect);
-	BITMAPINFOHEADER bmiHeader = { 40, 0, 0, 1, 24, BI_RGB, 0 };
-	double scale = (double)GetSystemMetrics(SM_CXSCREEN) / GetSystemMetrics(SM_CYSCREEN);
-	bmiHeader.biHeight = -cRect.Height();
-	bmiHeader.biWidth = (int)(cRect.Height() * scale);
-	m_ClientSocket.Send(&bmiHeader.biWidth, sizeof(bmiHeader.biWidth));
-	m_ClientSocket.Send(&bmiHeader.biHeight, sizeof(bmiHeader.biHeight));
-	bmiHeader.biSizeImage = ((bmiHeader.biWidth * 24 + 31) & ~31) / 8 * (-bmiHeader.biHeight);
-	BYTE* lpvBits = new BYTE[bmiHeader.biSizeImage];
-	int nBufferSize = 100;
-	m_ClientSocket.SetSockOpt(SO_RCVBUF, &nBufferSize, sizeof(nBufferSize), SOL_SOCKET);
-	while (m_ClientSocket.Receive(NULL, 1, MSG_PEEK) == 0);
+	int DestHeight = cRect.Height();
+	int DestWidth = (double)cRect.Height() * lpbmi.biWidth / (-lpbmi.biHeight);
 	while (true) {
-		Sleep(10);
-		while (m_ClientSocket.Receive(NULL, 1, MSG_PEEK) == 0);
-		int nByteReceived = 0;
-		while (nByteReceived < bmiHeader.biSizeImage) {
-			int n= m_ClientSocket.Receive(lpvBits + nByteReceived, bmiHeader.biSizeImage - nByteReceived);
-			nByteReceived += n;
-		}
-		PrintScreen(bmiHeader, lpvBits);
+		m_ClientSocket.Receive(&nBufLen, 4);
+		std::vector<uchar> buf(nBufLen);
+		n = 0;
+		while (n < nBufLen)
+			n += m_ClientSocket.Receive(&buf[0] + n, nBufLen - n);
+		lpBits = cv::imdecode(buf, cv::IMREAD_COLOR);
+		StretchDIBits(hdc, (lpbmi.biWidth - DestWidth) / 2, 0, DestWidth, DestHeight, 0, 0, lpBits.cols, lpBits.rows, lpBits.data, (BITMAPINFO*)&lpbmi, DIB_RGB_COLORS, SRCCOPY);
 	}
+
 	return CWinThread::Run();
 }
 
@@ -59,6 +52,7 @@ int CReceivingThread::Run()
 int CReceivingThread::ExitInstance()
 {
 	// TODO: Add your specialized code here and/or call the base class
+	m_ClientSocket.Close();
 
 	return CWinThread::ExitInstance();
 }

@@ -1,8 +1,6 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "SendingThread.h"
-#include <thread>
-#include <ctime>
-
+#include <opencv2/opencv.hpp>
 
 BOOL CSendingThread::InitInstance()
 {
@@ -12,45 +10,42 @@ BOOL CSendingThread::InitInstance()
 }
 
 
-void CapScreen(BITMAPINFOHEADER bmiHeader, BYTE* lpvBits) {
-	HDC hScreenDC = GetDC(NULL);
-	HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
-	HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, bmiHeader.biWidth, -bmiHeader.biHeight);
-	HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemoryDC, hBitmap);
-	StretchBlt(hMemoryDC, 0, 0, bmiHeader.biWidth, -bmiHeader.biHeight, hScreenDC, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), SRCCOPY);
-	GetDIBits(hMemoryDC, hBitmap, 0, -bmiHeader.biHeight, lpvBits, (BITMAPINFO*)&bmiHeader, DIB_RGB_COLORS);
-}
 int CSendingThread::Run()
 {
 	// TODO: Add your specialized code here and/or call the base class
 	m_ReceivingSocket.Create();
-	m_ReceivingSocket.Listen();
 	UINT rSocketPort;
 	CString rSocketAddress;
-	m_SendingSocket.Create(0, SOCK_DGRAM);
 	m_ReceivingSocket.GetSockName(rSocketAddress, rSocketPort);
+    m_SendingSocket.Create(0, SOCK_DGRAM);
 	m_SendingSocket.SetSockOpt(SO_BROADCAST, "0", 0);
 	m_SendingSocket.SendTo(&rSocketPort, 4, 1, NULL);
 	m_SendingSocket.Close();
+    m_ReceivingSocket.Listen();
 	m_ReceivingSocket.Accept(m_ServerSocket);
 	m_ReceivingSocket.Close();
-	BITMAPINFOHEADER bmiHeader = { 40, 0, 0, 1, 24, BI_RGB, 0 };
-	m_ServerSocket.Receive(&bmiHeader.biWidth, sizeof(bmiHeader.biWidth));
-	m_ServerSocket.Receive(&bmiHeader.biHeight, sizeof(bmiHeader.biHeight));
-	bmiHeader.biSizeImage = ((bmiHeader.biWidth * 24 + 31) & ~31) / 8 * (-bmiHeader.biHeight);
-	BYTE* lpvBits = new BYTE[bmiHeader.biSizeImage];
-	int nBufferSize = 100;
-	m_ServerSocket.SetSockOpt(SO_SNDBUF, &nBufferSize, sizeof(nBufferSize), SOL_SOCKET);
+	m_ServerSocket.SetSockOpt(TCP_NODELAY, "0", 0);
+	int lpOptionValue = 1000;
+	m_ServerSocket.SetSockOpt(SO_SNDBUF, &lpOptionValue, 4);
+    BITMAPINFOHEADER lpbmi = { 40, GetSystemMetrics(SM_CXSCREEN), -GetSystemMetrics(SM_CYSCREEN), 1, 24, BI_RGB };
+	m_ServerSocket.Send(&lpbmi.biWidth, 4);
+	m_ServerSocket.Send(&lpbmi.biHeight, 4);
+    std::vector<uchar> buf;
+    cv::Mat lpBits = cv::Mat(-lpbmi.biHeight, lpbmi.biWidth, CV_8UC3);
+	int n;
 	while (true) {
-		CapScreen(bmiHeader, lpvBits);
-		int nByteSent = 0;
-		while (nByteSent < bmiHeader.biSizeImage) {
-			int n= m_ServerSocket.Send(lpvBits + nByteSent, bmiHeader.biSizeImage - nByteSent);
-			if (n == 0) exit(0);
-			nByteSent += n;
-
-		}
-
+        HDC hScreenDC = GetDC(NULL);
+        HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
+        HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, lpbmi.biWidth, -lpbmi.biHeight);
+        SelectObject(hMemoryDC, hBitmap);
+        StretchBlt(hMemoryDC, 0, 0, lpbmi.biWidth, -lpbmi.biHeight, hScreenDC, 0, 0, lpbmi.biWidth, -lpbmi.biHeight, SRCCOPY);
+        GetDIBits(hMemoryDC, hBitmap, 0, -lpbmi.biHeight, lpBits.data, (BITMAPINFO*)&lpbmi, DIB_RGB_COLORS);
+        cv::imencode(".jpg", lpBits, buf);
+        int nBufLen = buf.size();
+        m_ServerSocket.Send(&nBufLen, 4);
+		int n = 0;
+		while (n < nBufLen) 
+			n += m_ServerSocket.Send((char*)&buf[0] + n, nBufLen - n);
 	}
 
 	return CWinThread::Run();
@@ -60,6 +55,7 @@ int CSendingThread::Run()
 int CSendingThread::ExitInstance()
 {
 	// TODO: Add your specialized code here and/or call the base class
+	m_ServerSocket.Close();
 
 	return CWinThread::ExitInstance();
 }
