@@ -5,6 +5,7 @@
 #pragma once
 #include "ServerSocket.h"
 #include "SendingThread.h"
+#include "ReceivingThread.h"
 
 class CMainFrame : public CFrameWndEx
 {
@@ -21,6 +22,7 @@ protected:
 	CButton cButton;
 	afx_msg void OnButtonClicked();
 	CSendingThread m_SendingThread;
-	CServerSocket m_ServerSocket;
+	CReceivingThread m_ReceivingThread;
+	CServerSocket ServerSocket;
 //
 };

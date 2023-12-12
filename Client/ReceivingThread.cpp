@@ -23,8 +23,9 @@ int CReceivingThread::Run()
 	m_ReceivingSocket.Close();
 	BITMAPINFOHEADER lpbmi = { 40, 0, 0, 1, 24, BI_RGB };
 	m_ClientSocket.SetSockOpt(TCP_NODELAY, "0", 0);
-	int lpOptionValue = 1000;
+	int lpOptionValue = 1000000;
 	m_ClientSocket.SetSockOpt(SO_RCVBUF, &lpOptionValue, 4);
+	m_ClientSocket.SetSockOpt(SO_RCVTIMEO, &lpOptionValue, 4);
 	m_ClientSocket.Receive(&lpbmi.biWidth, 4);
 	m_ClientSocket.Receive(&lpbmi.biHeight, 4);
 	int nBufLen;

@@ -6,12 +6,6 @@
 #include "Server.h"
 
 #include "MainFrm.h"
-#include <thread>
-#include <Windows.h>
-#include "ReceivingSocket.h"
-#include "ServerSocket.h"
-#include "SendingSocket.h"
-#include "SendingThread.h"
 // CMainFrame
 
 IMPLEMENT_DYNCREATE(CMainFrame, CFrameWndEx)
@@ -33,11 +27,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 }
 //
 void CMainFrame::OnButtonClicked() {
-	m_SendingThread.CreateThread();/*
-	AfxMessageBox(_T("Waiting"));
-	m_ServerSocket.Create(0, SOCK_DGRAM);
-	m_ServerSocket.SetSockOpt(SO_BROADCAST, "0", 0);
-	m_ServerSocket.SendTo(NULL, 0, 2, NULL);*/
-
+	m_SendingThread.CreateThread();
+	m_ReceivingThread.CreateThread();
 }
 //

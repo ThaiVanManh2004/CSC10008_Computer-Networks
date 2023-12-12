@@ -14,8 +14,8 @@ int CSendingThread::Run()
 {
 	// TODO: Add your specialized code here and/or call the base class
 	m_ReceivingSocket.Create();
-	UINT rSocketPort;
 	CString rSocketAddress;
+	UINT rSocketPort;
 	m_ReceivingSocket.GetSockName(rSocketAddress, rSocketPort);
     m_SendingSocket.Create(0, SOCK_DGRAM);
 	m_SendingSocket.SetSockOpt(SO_BROADCAST, "0", 0);
@@ -25,7 +25,7 @@ int CSendingThread::Run()
 	m_ReceivingSocket.Accept(m_ServerSocket);
 	m_ReceivingSocket.Close();
 	m_ServerSocket.SetSockOpt(TCP_NODELAY, "0", 0);
-	int lpOptionValue = 1000;
+	int lpOptionValue = INT_MAX;
 	m_ServerSocket.SetSockOpt(SO_SNDBUF, &lpOptionValue, 4);
     BITMAPINFOHEADER lpbmi = { 40, GetSystemMetrics(SM_CXSCREEN), -GetSystemMetrics(SM_CYSCREEN), 1, 24, BI_RGB };
 	m_ServerSocket.Send(&lpbmi.biWidth, 4);
@@ -33,11 +33,11 @@ int CSendingThread::Run()
     std::vector<uchar> buf;
     cv::Mat lpBits = cv::Mat(-lpbmi.biHeight, lpbmi.biWidth, CV_8UC3);
 	int n;
+	HDC hScreenDC = GetDC(NULL);
+	HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
+	HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, lpbmi.biWidth, -lpbmi.biHeight);
+	SelectObject(hMemoryDC, hBitmap);
 	while (true) {
-        HDC hScreenDC = GetDC(NULL);
-        HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
-        HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, lpbmi.biWidth, -lpbmi.biHeight);
-        SelectObject(hMemoryDC, hBitmap);
         StretchBlt(hMemoryDC, 0, 0, lpbmi.biWidth, -lpbmi.biHeight, hScreenDC, 0, 0, lpbmi.biWidth, -lpbmi.biHeight, SRCCOPY);
         GetDIBits(hMemoryDC, hBitmap, 0, -lpbmi.biHeight, lpBits.data, (BITMAPINFO*)&lpbmi, DIB_RGB_COLORS);
         cv::imencode(".jpg", lpBits, buf);

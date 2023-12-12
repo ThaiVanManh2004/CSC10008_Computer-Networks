@@ -1,11 +1,12 @@
 #pragma once
 #include <afxwin.h>
-class CReceivingThread :
+class CSendingThread :
     public CWinThread
 {
 public:
-    CSocket m_ReceivingSocket;
     CSocket m_ClientSocket;
+    CString rSocketAddress;
+    UINT rSocketPort;
 public:
     virtual BOOL InitInstance();
     virtual int Run();

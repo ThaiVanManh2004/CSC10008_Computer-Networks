@@ -4,8 +4,7 @@ class CReceivingThread :
     public CWinThread
 {
 public:
-    CSocket m_ReceivingSocket;
-    CSocket m_ClientSocket;
+    CSocket m_ServerSocket;
 public:
     virtual BOOL InitInstance();
     virtual int Run();

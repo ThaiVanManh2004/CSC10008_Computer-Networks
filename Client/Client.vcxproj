@@ -187,9 +187,9 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="ReceivingSocket.h" />
     <ClInclude Include="ReceivingThread.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="SendingThread.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -201,8 +201,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="ReceivingSocket.cpp" />
     <ClCompile Include="ReceivingThread.cpp" />
+    <ClCompile Include="SendingThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc" />
