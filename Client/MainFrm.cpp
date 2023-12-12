@@ -20,11 +20,11 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	//
 	ON_BN_CLICKED(IDC_BUTTON, OnButtonClicked)
 	ON_WM_LBUTTONUP()
+	//ON_WM_MOUSEMOVE()
 	//
 	//ON_COMMAND(ID_DISPLAY_IMAGE, OnDisplayImage) 
 	//
 END_MESSAGE_MAP()
-
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	//
@@ -32,6 +32,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	cButton.ShowWindow(SW_SHOWMAXIMIZED);
 	return 0;
 }
+//void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
+//{
+//	// 'point' chứa tọa độ của chuột (point.x là hoành độ, point.y là tung độ)
+//	// Bạn có thể thực hiện xử lý dựa trên vị trí của chuột tại đây
+//	// Ví dụ:
+//	TRACE(_T("Mouse moved to (%d, %d)\n"), point.x, point.y);
+//
+//	CMainFrame::OnMouseMove(nFlags, point);
+//}
 void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point) {
 	CWnd::OnLButtonUp(nFlags, point);
 	CRect rect;
@@ -53,12 +62,12 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point) {
 void CMainFrame::OnButtonClicked() {
 	m_ReceivingThread.CreateThread();
 	cButton.ShowWindow(SW_HIDE);
-	AfxMessageBox(_T("Waiting"));
-	m_ClientSocket.Create(2, SOCK_DGRAM);
-	m_ClientSocket.ReceiveFrom(NULL, 0, rSocketAddress, rSocketPort);
-	AfxMessageBox(rSocketAddress);
-	CString str;
-	str.Format(_T("%u"), rSocketPort);
-	AfxMessageBox(str);
+	//AfxMessageBox(_T("Waiting"));
+	//m_ClientSocket.Create(2, SOCK_DGRAM);
+	//m_ClientSocket.ReceiveFrom(NULL, 0, rSocketAddress, rSocketPort);
+	//AfxMessageBox(rSocketAddress);
+	//CString str;
+	//str.Format(_T("%u"), rSocketPort);
+	//AfxMessageBox(str);
 }
 //
