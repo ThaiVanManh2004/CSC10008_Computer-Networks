@@ -18,8 +18,8 @@ int CSendingThread::Run()
 	m_ServerSocket.Accept(m_SendingSocket);
 	m_ServerSocket.Close();
 	m_SendingSocket.SetSockOpt(TCP_NODELAY, "0", 0);
-	int lpOptionValue = 100;
-	m_SendingSocket.SetSockOpt(SO_SNDBUF, &lpOptionValue, 4);
+	//int lpOptionValue = 100;
+	//m_SendingSocket.SetSockOpt(SO_SNDBUF, &lpOptionValue, 4);
     BITMAPINFOHEADER lpbmi = { 40, GetSystemMetrics(SM_CXSCREEN), -GetSystemMetrics(SM_CYSCREEN), 1, 24, BI_RGB };
 	m_SendingSocket.Send(&lpbmi.biWidth, 4);
 	m_SendingSocket.Send(&lpbmi.biHeight, 4);
