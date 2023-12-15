@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ReceivingThread.h"
 #include <opencv2/opencv.hpp>
+#include "MainFrm.h"
 
 BOOL CReceivingThread::InitInstance()
 {
@@ -13,17 +14,11 @@ BOOL CReceivingThread::InitInstance()
 int CReceivingThread::Run()
 {
 	// TODO: Add your specialized code here and/or call the base class
-	m_ReceivingSocket.Create(1, SOCK_DGRAM);
 	m_ClientSocket.Create();
-	UINT lpBuf;
-	CString rSocketAddress;
-	UINT rSocketPort;
-	m_ReceivingSocket.ReceiveFrom(&lpBuf, 4, rSocketAddress, rSocketPort);
-	m_ClientSocket.Connect(rSocketAddress, lpBuf);
-	m_ReceivingSocket.Close();
+	m_ClientSocket.Connect(rSocketAddress, 1);
 	BITMAPINFOHEADER lpbmi = { 40, 0, 0, 1, 24, BI_RGB };
 	m_ClientSocket.SetSockOpt(TCP_NODELAY, "0", 0);
-	int lpOptionValue = 1000;
+	int lpOptionValue = 100;
 	m_ClientSocket.SetSockOpt(SO_RCVBUF, &lpOptionValue, 4);
 	m_ClientSocket.Receive(&lpbmi.biWidth, 4);
 	m_ClientSocket.Receive(&lpbmi.biHeight, 4);

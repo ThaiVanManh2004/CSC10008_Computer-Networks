@@ -33,10 +33,13 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReceivingSocket.h">
+    <ClInclude Include="ReceivingThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReceivingThread.h">
+    <ClInclude Include="SendingThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,10 +53,13 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReceivingSocket.cpp">
+    <ClCompile Include="ReceivingThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReceivingThread.cpp">
+    <ClCompile Include="SendingThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
