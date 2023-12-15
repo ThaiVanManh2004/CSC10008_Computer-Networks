@@ -4,6 +4,8 @@
 
 #pragma once
 #include "ServerSocket.h"
+#include "ReceivingSocket.h"
+#include "ServerThread.h"
 #include "SendingThread.h"
 #include "ReceivingThread.h"
 
@@ -18,11 +20,17 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	DECLARE_MESSAGE_MAP()
 //
-protected:
-	CButton cButton;
-	afx_msg void OnButtonClicked();
+public:
+	CServerSocket m_ServerSocket;
+	CReceivingSocket m_ReceivingSocket;
+	CButton initButton;
+	void OnInitButtonClicked();
+	CButton exitButton;
+	void OnExitButtonClicked();
+	CServerThread* m_ServerThread;
+
 	CSendingThread m_SendingThread;
 	CReceivingThread m_ReceivingThread;
-	CServerSocket ServerSocket;
 //
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

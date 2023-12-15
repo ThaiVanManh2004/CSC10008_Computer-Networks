@@ -3,4 +3,7 @@
 class CReceivingSocket :
     public CSocket
 {
+public:
+    virtual void OnReceive(int nErrorCode);
 };
+

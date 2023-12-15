@@ -71,6 +71,7 @@ int CReceivingThread::Run()
 			int y;
 			m_ServerSocket.Receive(&x, 4);
 			m_ServerSocket.Receive(&y, 4);
+
 			LMouseUp(x, y);
 		}
 		if (lpBuf == 'R') {

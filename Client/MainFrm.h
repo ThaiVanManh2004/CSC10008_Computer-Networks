@@ -2,9 +2,9 @@
 // MainFrm.h : interface of the CMainFrame class
 //
 #pragma once
+#include "ClientThread.h"
 #include "ReceivingThread.h"
 #include "SendingThread.h"
-#include <afxsock.h>
 
 class CMainFrame : public CFrameWndEx
 {
@@ -19,10 +19,29 @@ protected:
 
 //
 public:
-	CButton cButton;
-	afx_msg void OnButtonClicked();
+	CButton initButton;
+	void OnInitButtonClicked();
+	CButton exitButton;
+	void OnExitButtonClicked();
+
+	CSocket m_ClientSocket;
+	CSocket m_SendingSocket;
+	CClientThread m_ClientThread;
+
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	int Width;
+	int Height;
+	int buttonHeight;
+
+	CButton cButton[10];
+	int nButton = 0;
+	afx_msg void OnButtonClicked(UINT nID);
+
 	CReceivingThread m_ReceivingThread;
 	CSendingThread m_SendingThread;
+
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
