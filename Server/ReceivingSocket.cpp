@@ -73,13 +73,12 @@ void CReceivingSocket::OnReceive(int nErrorCode)
         Receive(&x, 4);
         Receive(&y, 4);
         MouseMove(x, y);
-        CString str;
-        str.Format(_T("%d %d"), x, y);
-        AfxMessageBox(str);
     }
           break;
-    case 1:
+    case 1: {
+
         LMouseDown();
+    }
         break;
     case 2:
         LMouseUp();
