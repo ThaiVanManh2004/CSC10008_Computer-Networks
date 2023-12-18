@@ -39,9 +39,6 @@
     <ClInclude Include="ServerSocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReceivingThread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ServerThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -63,9 +60,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ServerSocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ReceivingThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ServerThread.cpp">

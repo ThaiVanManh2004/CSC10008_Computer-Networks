@@ -36,9 +36,6 @@
     <ClInclude Include="ReceivingThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SendingThread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ClientThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -54,9 +51,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReceivingThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SendingThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ClientThread.cpp">
