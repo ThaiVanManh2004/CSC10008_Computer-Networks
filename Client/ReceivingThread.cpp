@@ -30,7 +30,7 @@ int CReceivingThread::Run()
 	GetClientRect(GetMainWnd()->GetSafeHwnd(), cRect);
 	int DestHeight = cRect.Height();
 	int DestWidth = (double)cRect.Height() * lpbmi.biWidth / (-lpbmi.biHeight);
-	while (true) {
+	while (running) {
 		m_ClientSocket.Receive(&nBufLen, 4);
 		std::vector<uchar> buf(nBufLen);
 		n = 0;
@@ -39,6 +39,7 @@ int CReceivingThread::Run()
 		lpBits = cv::imdecode(buf, cv::IMREAD_COLOR);
 		StretchDIBits(hdc, (lpbmi.biWidth - DestWidth) / 2, 0, DestWidth, DestHeight, 0, 0, lpBits.cols, lpBits.rows, lpBits.data, (BITMAPINFO*)&lpbmi, DIB_RGB_COLORS, SRCCOPY);
 	}
+	ReleaseDC(NULL, hdc);
 
 	return CWinThread::Run();
 }

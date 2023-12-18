@@ -6,6 +6,7 @@
 #include "Server.h"
 
 #include "MainFrm.h"
+
 // CMainFrame
 
 IMPLEMENT_DYNCREATE(CMainFrame, CFrameWndEx)
@@ -25,37 +26,36 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	initButton.ShowWindow(SW_MAXIMIZE);
 	exitButton.Create(_T("Exit"), BS_DEFPUSHBUTTON, CRect(0, 0, 0, 0), this, 2);
 	//
+
 	return 0;
 }
+
 //
 void CMainFrame::OnInitButtonClicked() {
-	m_ServerSocket.Create(0, SOCK_DGRAM);
+	delete m_pServerThread;
+	delete m_pSendingThread;
+
+	m_ServerSocket.Create();
 	CString rSocketAddress;
-	delete m_ServerThread;
-	m_ServerThread = new CServerThread;
-	m_ServerSocket.GetSockName(rSocketAddress, m_ServerThread->rSocketPort);
-	m_ServerThread->CreateThread();
+	m_pServerThread = new CServerThread;
+	m_ServerSocket.m_pServerThread = m_pServerThread;
+	m_ServerSocket.GetSockName(rSocketAddress, m_pServerThread->rSocketPort);
+	m_pServerThread->CreateThread();
+	m_ServerSocket.Listen();
+	m_pSendingThread = new CSendingThread;
+	m_ServerSocket.m_pSendingThread = m_pSendingThread;
+
 	initButton.ShowWindow(SW_HIDE);
 	exitButton.ShowWindow(SW_MAXIMIZE);
 }
 void CMainFrame::OnExitButtonClicked() {
-	m_ServerThread->ExitInstance();
+	m_pServerThread->running = false;
 	m_ServerSocket.Close();
+
+	m_pSendingThread->running = false;
+	m_ServerSocket.m_ReceivingSocket.Close();
+
 	exitButton.ShowWindow(SW_HIDE);
 	initButton.ShowWindow(SW_MAXIMIZE);
 }
 //
-
-BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
-{
-	// TODO: Add your specialized code here and/or call the base class
-	if (pMsg->message == NULL) {
-		m_SendingThread.CreateThread();
-		CSocket m_ServerSocket;
-		m_ServerSocket.Create(2);
-		m_ServerSocket.Listen();
-		m_ServerSocket.Accept(m_ReceivingSocket);
-	}
-
-	return CFrameWndEx::PreTranslateMessage(pMsg);
-}

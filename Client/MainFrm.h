@@ -1,10 +1,12 @@
 ﻿
 // MainFrm.h : interface of the CMainFrame class
 //
+
 #pragma once
+//
 #include "ClientThread.h"
 #include "ReceivingThread.h"
-#include "SendingThread.h"
+//
 
 class CMainFrame : public CFrameWndEx
 {
@@ -23,27 +25,26 @@ public:
 	void OnInitButtonClicked();
 	CButton exitButton;
 	void OnExitButtonClicked();
-
-	CSocket m_ClientSocket;
-	CSocket m_SendingSocket;
-	CClientThread m_ClientThread;
-
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	CButton cButton[10];
 	int Width;
 	int Height;
 	int buttonHeight;
-
-	CButton cButton[10];
-	int nButton = 0;
-	afx_msg void OnButtonClicked(UINT nID);
-
-	CReceivingThread m_ReceivingThread;
-	CSendingThread m_SendingThread;
-
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	void OnButtonClicked(UINT nID);
+	CSocket m_SendingSocket;
+	CClientThread* m_pClientThread;
+	CReceivingThread* m_pReceivingThread;
+//
+	afx_msg void OnClose();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnRButtonDblClk(UINT nFlags, CPoint point);
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
-//
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 };
+

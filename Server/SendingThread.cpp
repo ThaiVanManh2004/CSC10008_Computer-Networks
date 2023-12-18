@@ -30,7 +30,7 @@ int CSendingThread::Run()
 	HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
 	HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, lpbmi.biWidth, -lpbmi.biHeight);
 	SelectObject(hMemoryDC, hBitmap);
-	while (true) {
+	while (running) {
 		BitBlt(hMemoryDC, 0, 0, lpbmi.biWidth, -lpbmi.biHeight, hScreenDC, 0, 0, SRCCOPY);
         GetDIBits(hMemoryDC, hBitmap, 0, -lpbmi.biHeight, lpBits.data, (BITMAPINFO*)&lpbmi, DIB_RGB_COLORS);
 		cv::imencode(".jpg", lpBits, buf);
@@ -42,13 +42,4 @@ int CSendingThread::Run()
 	}
 
 	return CWinThread::Run();
-}
-
-
-int CSendingThread::ExitInstance()
-{
-	// TODO: Add your specialized code here and/or call the base class
-	m_ServerSocket.Close();
-
-	return CWinThread::ExitInstance();
 }

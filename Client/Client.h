@@ -4,8 +4,6 @@
 #pragma once
 
 #include "resource.h"       // main symbols
-//
-//
 
 
 // CClientApp:
@@ -18,6 +16,4 @@ class CClientApp : public CWinAppEx
 public:
 	virtual BOOL InitInstance();
 
-//
-//
 };

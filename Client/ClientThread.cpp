@@ -57,11 +57,3 @@ int CClientThread::Run()
 	return CWinThread::Run();
 }
 
-
-int CClientThread::ExitInstance()
-{
-	// TODO: Add your specialized code here and/or call the base class
-	running = false;
-
-	return CWinThread::ExitInstance();
-}

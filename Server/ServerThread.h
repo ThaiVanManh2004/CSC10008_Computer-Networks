@@ -5,12 +5,10 @@ class CServerThread :
 {
 public:
     UINT rSocketPort;
+    CSocket m_ServerSocket;
     bool running = true;
-    bool b = false;
-    CSocket m_SendingSocket;
+    char lpBuf = 1;
 public:
     virtual BOOL InitInstance();
     virtual int Run();
-    virtual int ExitInstance();
 };
-

@@ -15,6 +15,5 @@ public:
 public:
     virtual BOOL InitInstance();
     virtual int Run();
-    virtual int ExitInstance();
 };
 

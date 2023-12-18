@@ -6,6 +6,7 @@
 #include "Server.h"
 #include "MainFrm.h"
 
+
 // The one and only CServerApp object
 
 CServerApp theApp;
@@ -29,6 +30,8 @@ BOOL CServerApp::InitInstance()
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
+
+
 	// To create the main window, this code creates a new frame window
 	// object and then sets it as the application's main window object
 	CFrameWnd* pFrame = new CMainFrame;

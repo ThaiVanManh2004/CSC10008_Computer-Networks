@@ -4,8 +4,6 @@
 //
 #define IDP_SOCKETS_INIT_FAILED		104
 #define IDR_MAINFRAME				128
-#define IDC_BUTTON					1
-#define ID_DISPLAY_IMAGE			2
 
 // Next default values for new objects
 //
