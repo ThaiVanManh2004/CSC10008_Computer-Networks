@@ -129,22 +129,24 @@ void CMainFrame::OnClose()
 void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	char lpBuf = 1;
-	while (m_SendingSocket.Send(&lpBuf, 1) < 1);
-	CRect rect;
-	GetClientRect(rect);
-	double scale = (double)GetSystemMetrics(SM_CXSCREEN) / GetSystemMetrics(SM_CYSCREEN);
-	int width = rect.Height() * scale;
-	int height = rect.Height();
-	if (point.x< (GetSystemMetrics(SM_CXSCREEN) - width) / 2 || point.x>(GetSystemMetrics(SM_CXSCREEN) - width) / 2 + width) {
-		return;
-	}
-	else {
-		point.x = point.x - (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
-		point.x = (double)point.x / width * GetSystemMetrics(SM_CXSCREEN);
-		point.y = (double)point.y / height * GetSystemMetrics(SM_CYSCREEN);
-		while (m_SendingSocket.Send(&point.x, sizeof(point.x)) < sizeof(point.x));
-		while (m_SendingSocket.Send(&point.y, sizeof(point.y)) < sizeof(point.y));
+	if (m_SendingSocket != -1) {
+		char lpBuf = 1;
+		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+		CRect rect;
+		GetClientRect(rect);
+		double scale = (double)GetSystemMetrics(SM_CXSCREEN) / GetSystemMetrics(SM_CYSCREEN);
+		int width = rect.Height() * scale;
+		int height = rect.Height();
+		if (point.x< (GetSystemMetrics(SM_CXSCREEN) - width) / 2 || point.x>(GetSystemMetrics(SM_CXSCREEN) - width) / 2 + width) {
+			return;
+		}
+		else {
+			point.x = point.x - (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
+			point.x = (double)point.x / width * GetSystemMetrics(SM_CXSCREEN);
+			point.y = (double)point.y / height * GetSystemMetrics(SM_CYSCREEN);
+			while (m_SendingSocket.Send(&point.x, sizeof(point.x)) < sizeof(point.x));
+			while (m_SendingSocket.Send(&point.y, sizeof(point.y)) < sizeof(point.y));
+		}
 	}
 }
 
@@ -152,8 +154,10 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	char lpBuf = 2;
-	while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+	if (m_SendingSocket != -1) {
+		char lpBuf = 2;
+		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+	}
 
 	CFrameWndEx::OnLButtonDown(nFlags, point);
 }
@@ -162,8 +166,10 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	char lpBuf = 3;
-	while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+	if (m_SendingSocket != -1) {
+		char lpBuf = 3;
+		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+	}
 
 	CFrameWndEx::OnLButtonUp(nFlags, point);
 }
@@ -172,8 +178,10 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 void CMainFrame::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	char lpBuf = 4;
-	while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+	if (m_SendingSocket != -1) {
+		char lpBuf = 4;
+		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+	}
 
 	CFrameWndEx::OnLButtonDblClk(nFlags, point);
 }
@@ -182,8 +190,10 @@ void CMainFrame::OnLButtonDblClk(UINT nFlags, CPoint point)
 void CMainFrame::OnRButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	char lpBuf = 5;
-	while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+	if (m_SendingSocket != -1) {
+		char lpBuf = 5;
+		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+	}
 
 	CFrameWndEx::OnRButtonDown(nFlags, point);
 }
@@ -192,8 +202,10 @@ void CMainFrame::OnRButtonDown(UINT nFlags, CPoint point)
 void CMainFrame::OnRButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	char lpBuf = 6;
-	while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+	if (m_SendingSocket != -1) {
+		char lpBuf = 6;
+		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+	}
 
 	CFrameWndEx::OnRButtonUp(nFlags, point);
 }
@@ -202,8 +214,10 @@ void CMainFrame::OnRButtonUp(UINT nFlags, CPoint point)
 void CMainFrame::OnRButtonDblClk(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	char lpBuf = 7;
-	while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+	if (m_SendingSocket != -1) {
+		char lpBuf = 7;
+		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+	}
 
 	CFrameWndEx::OnRButtonDblClk(nFlags, point);
 }
@@ -212,9 +226,11 @@ void CMainFrame::OnRButtonDblClk(UINT nFlags, CPoint point)
 void CMainFrame::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	// TODO: Add your message handler code here and/or call default
-	char lpBuf = 8;
-	while (m_SendingSocket.Send(&lpBuf, 1) < 1);
-	while (m_SendingSocket.Send(&nChar, sizeof(nChar)) < sizeof(nChar));
+	if (m_SendingSocket != -1) {
+		char lpBuf = 8;
+		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+		while (m_SendingSocket.Send(&nChar, sizeof(nChar)) < sizeof(nChar));
+	}
 
 	CFrameWndEx::OnKeyDown(nChar, nRepCnt, nFlags);
 }
@@ -223,9 +239,11 @@ void CMainFrame::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 void CMainFrame::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	// TODO: Add your message handler code here and/or call default
-	char lpBuf = 9;
-	while (m_SendingSocket.Send(&lpBuf, 1) < 1);
-	while (m_SendingSocket.Send(&nChar, sizeof(nChar)) < sizeof(nChar));
+	if (m_SendingSocket != -1) {
+		char lpBuf = 9;
+		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+		while (m_SendingSocket.Send(&nChar, sizeof(nChar)) < sizeof(nChar));
+	}
 
 	CFrameWndEx::OnKeyUp(nChar, nRepCnt, nFlags);
 }
@@ -234,10 +252,11 @@ void CMainFrame::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 BOOL CMainFrame::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	// TODO: Add your message handler code here and/or call default
-	char lpBuf = 10;
-	while (m_SendingSocket.Send(&lpBuf, 1) < 1);
-	while (m_SendingSocket.Send(&zDelta, sizeof(zDelta)) < sizeof(zDelta));
-	return TRUE;
+	if (m_SendingSocket != -1) {
+		char lpBuf = 10;
+		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
+		while (m_SendingSocket.Send(&zDelta, sizeof(zDelta)) < sizeof(zDelta));
+	}
 
 	return CFrameWndEx::OnMouseWheel(nFlags, zDelta, pt);
 }
