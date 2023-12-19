@@ -3,7 +3,7 @@
 class CReceivingSocket :
     public CSocket
 {
-private:
+public:
     char lpBuf;
     int x, y;
 public:

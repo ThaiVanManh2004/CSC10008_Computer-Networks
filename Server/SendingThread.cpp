@@ -40,6 +40,9 @@ int CSendingThread::Run()
 		while (n < nBufLen) 
 			n += m_SendingSocket.Send((char*)&buf[0] + n, nBufLen - n);
 	}
+	DeleteObject(hBitmap);
+	DeleteDC(hMemoryDC);
+	ReleaseDC(NULL, hScreenDC);
 
 	return CWinThread::Run();
 }
