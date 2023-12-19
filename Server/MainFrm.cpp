@@ -22,9 +22,9 @@ END_MESSAGE_MAP()
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	//
-	initButton.Create(_T("Init"), BS_DEFPUSHBUTTON, CRect(0, 0, 0, 0), this, 1);
+	initButton.Create(_T("INIT"), BS_DEFPUSHBUTTON, CRect(0, 0, 0, 0), this, 1);
 	initButton.ShowWindow(SW_MAXIMIZE);
-	exitButton.Create(_T("Exit"), BS_DEFPUSHBUTTON, CRect(0, 0, 0, 0), this, 2);
+	exitButton.Create(_T("EXIT"), BS_DEFPUSHBUTTON, CRect(0, 0, 0, 0), this, 2);
 	//
 
 	return 0;

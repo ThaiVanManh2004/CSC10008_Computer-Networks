@@ -34,9 +34,9 @@ END_MESSAGE_MAP()
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	//
-	initButton.Create(_T("Init"), BS_DEFPUSHBUTTON, CRect(0, 0, 0, 0), this, 1);
+	initButton.Create(_T("INIT"), BS_DEFPUSHBUTTON, CRect(0, 0, 0, 0), this, 1);
 	initButton.ShowWindow(SW_MAXIMIZE);
-	exitButton.Create(_T("Exit"), BS_DEFPUSHBUTTON, CRect(0, 0, 0, 0), this, 2);
+	exitButton.Create(_T("EXIT"), BS_DEFPUSHBUTTON, CRect(0, 0, 0, 0), this, 2);
 	for (int i = 0; i < 10; i++)
 		cButton[i].Create(_T(""), BS_DEFPUSHBUTTON, CRect(0, 0, 0, 0), this, 3 + i);
 	//
@@ -72,7 +72,8 @@ void CMainFrame::OnInitButtonClicked() {
 	Height = ClientRect.Height();
 	Width = ClientRect.Width();
 
-	delete m_pClientThread;
+	//delete m_pClientThread;
+	//delete m_pReceivingThread;
 
 	m_pClientThread = new CClientThread;
 	m_pClientThread->CreateThread();
@@ -158,8 +159,6 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 		char lpBuf = 2;
 		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
 	}
-
-	CFrameWndEx::OnLButtonDown(nFlags, point);
 }
 
 
@@ -170,8 +169,6 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		char lpBuf = 3;
 		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
 	}
-
-	CFrameWndEx::OnLButtonUp(nFlags, point);
 }
 
 
@@ -182,8 +179,6 @@ void CMainFrame::OnLButtonDblClk(UINT nFlags, CPoint point)
 		char lpBuf = 4;
 		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
 	}
-
-	CFrameWndEx::OnLButtonDblClk(nFlags, point);
 }
 
 
@@ -194,8 +189,6 @@ void CMainFrame::OnRButtonDown(UINT nFlags, CPoint point)
 		char lpBuf = 5;
 		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
 	}
-
-	CFrameWndEx::OnRButtonDown(nFlags, point);
 }
 
 
@@ -206,8 +199,6 @@ void CMainFrame::OnRButtonUp(UINT nFlags, CPoint point)
 		char lpBuf = 6;
 		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
 	}
-
-	CFrameWndEx::OnRButtonUp(nFlags, point);
 }
 
 
@@ -218,8 +209,6 @@ void CMainFrame::OnRButtonDblClk(UINT nFlags, CPoint point)
 		char lpBuf = 7;
 		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
 	}
-
-	CFrameWndEx::OnRButtonDblClk(nFlags, point);
 }
 
 
@@ -231,8 +220,6 @@ void CMainFrame::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
 		while (m_SendingSocket.Send(&nChar, sizeof(nChar)) < sizeof(nChar));
 	}
-
-	CFrameWndEx::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
 
@@ -244,8 +231,6 @@ void CMainFrame::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
 		while (m_SendingSocket.Send(&nChar, sizeof(nChar)) < sizeof(nChar));
 	}
-
-	CFrameWndEx::OnKeyUp(nChar, nRepCnt, nFlags);
 }
 
 
@@ -257,6 +242,5 @@ BOOL CMainFrame::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		while (m_SendingSocket.Send(&lpBuf, 1) < 1);
 		while (m_SendingSocket.Send(&zDelta, sizeof(zDelta)) < sizeof(zDelta));
 	}
-
-	return CFrameWndEx::OnMouseWheel(nFlags, zDelta, pt);
+	return TRUE;
 }
